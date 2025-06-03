@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Utilisateur {
+  id             Int             @id @default(autoincrement())
+  nom            String
+  email          String          @unique
+  motDePasse     String
+  role           Role
+
+  medecin        Medecin?
+  administrateur Administrateur?
+}
+
+model Patient {
+  id            Int              @id @default(autoincrement())
+  nom           String
+  prenom        String
+  dateNaissance DateTime
+  adresse       String
+  telephone     String
+
+  dossiers      DossierMedical[]
+  rendezVous    RendezVous[]
+  allergies     Allergie[]       // relation 1:N avec Allergie
+}
+
+model Allergie {
+  id        Int     @id @default(autoincrement())
+  nom       String
+  patientId Int
+  patient   Patient @relation(fields: [patientId], references: [id])
+}
+
+model Medecin {
+  id             Int           @id @default(autoincrement())
+  specialite     String
+  utilisateurId  Int           @unique
+  utilisateur    Utilisateur   @relation(fields: [utilisateurId], references: [id])
+
+  dossiers       DossierMedical[]
+  prescriptions  Prescription[]
+  rendezVous     RendezVous[]
+}
+
+model Administrateur {
+  id             Int           @id @default(autoincrement())
+  utilisateurId  Int           @unique
+  utilisateur    Utilisateur   @relation(fields: [utilisateurId], references: [id])
+}
+
+model DossierMedical {
+  id             Int           @id @default(autoincrement())
+  historique     String
+  notesMedic     String
+
+  patientId      Int
+  medecinId      Int
+
+  patient        Patient       @relation(fields: [patientId], references: [id])
+  medecin        Medecin       @relation(fields: [medecinId], references: [id])
+
+  prescriptions  Prescription[]
+}
+
+model Prescription {
+  id             Int           @id @default(autoincrement())
+  date           DateTime
+
+  dossierId      Int
+  medecinId      Int
+
+  dossier        DossierMedical @relation(fields: [dossierId], references: [id])
+  medecin        Medecin        @relation(fields: [medecinId], references: [id])
+
+  medicaments    Medicament[]   @relation("PrescriptionMedicament")
+}
+
+model Medicament {
+  id             Int           @id @default(autoincrement())
+  nom            String
+  dosage         String
+  duree          String
+
+  prescriptions  Prescription[] @relation("PrescriptionMedicament")
+}
+
+model RendezVous {
+  id               Int         @id @default(autoincrement())
+  date             DateTime
+  heure            String
+  typeConsultation String
+  rappel           Boolean
+
+  patientId        Int
+  medecinId        Int
+
+  patient          Patient     @relation(fields: [patientId], references: [id])
+  medecin          Medecin     @relation(fields: [medecinId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  MEDECIN
+}
