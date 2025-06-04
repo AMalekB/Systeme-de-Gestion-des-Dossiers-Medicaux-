@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -18,16 +19,18 @@ export default function Connexion() {
       });
 
       const data = await res.json();
+      console.log("Réponse /api/login :", res.status, data);
 
       if (!res.ok) {
-        alert(data.message || "Erreur de connexion");
+        alert(data.message || "Email ou mot de passe invalide");
         return;
       }
 
-      // ✅ Stocke le token
+      // → Stocke le token et le rôle dans localStorage
       localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
 
-      // ✅ Redirige selon le rôle
+      // → Redirige selon le rôle
       if (data.role === "ADMIN") {
         router.push("/admin/dashboard");
       } else if (data.role === "MEDECIN") {
