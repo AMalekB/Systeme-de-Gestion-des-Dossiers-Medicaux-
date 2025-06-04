@@ -28,9 +28,9 @@ export default function Connexion() {
       localStorage.setItem("token", data.token);
 
       // ✅ Redirige selon le rôle
-      if (data.role === "administrateur") {
+      if (data.role === "ADMIN") {
         router.push("/admin/dashboard");
-      } else if (data.role === "medecin") {
+      } else if (data.role === "MEDECIN") {
         router.push("/medecin/dashboard");
       } else {
         alert("Rôle inconnu !");
