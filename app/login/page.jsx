@@ -1,14 +1,44 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Connexion() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const handleConnexion = (e) => {
+  const handleConnexion = async (e) => {
     e.preventDefault();
-    // ⚠️ À remplacer par ton appel à l'API
-    console.log("Tentative de connexion avec :", email, password);
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Erreur de connexion");
+        return;
+      }
+
+      // ✅ Stocke le token
+      localStorage.setItem("token", data.token);
+
+      // ✅ Redirige selon le rôle
+      if (data.role === "administrateur") {
+        router.push("/admin/dashboard");
+      } else if (data.role === "medecin") {
+        router.push("/medecin/dashboard");
+      } else {
+        alert("Rôle inconnu !");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erreur serveur");
+    }
   };
 
   return (
