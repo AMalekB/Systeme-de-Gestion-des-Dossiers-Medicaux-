@@ -9,7 +9,6 @@ export default function DashboardAdmin() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-<<<<<<< HEAD
     if (!token) {
       router.push("/login");
       return;
@@ -29,20 +28,6 @@ export default function DashboardAdmin() {
   }, [router]);
 
   if (!autorisé) return null;
-=======
-    const role = localStorage.getItem("role");
-
-    if (!token || role !== "ADMIN") {
-      router.push("/login");
-    } else {
-      setAutorisé(true);
-    }
-  }, [router]);
-
-  if (!autorisé) {
-    return null;
-  }
->>>>>>> adda6cab6f242e6938251043e9fcab3739778aa8
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-sky-100 text-gray-800">
