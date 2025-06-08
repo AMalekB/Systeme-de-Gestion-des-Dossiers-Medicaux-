@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import LayoutDashboard from '@/components/LayoutDashboard'
 
 export default function DashboardMedecin() {
   const router = useRouter();
@@ -30,10 +31,9 @@ export default function DashboardMedecin() {
   if (!autorisé) return null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-green-100 text-gray-800">
-      <h1 className="text-4xl font-bold">
-        Bienvenue dans le dashboard médecin
-      </h1>
-    </main>
+     <LayoutDashboard>
+      <h2 className="text-2xl font-bold mb-4">Bienvenue Médecin</h2>
+      <p>Ici, vous pouvez consulter vos patients, gérer les dossiers médicaux et les rendez-vous.</p>
+    </LayoutDashboard>
   );
 }

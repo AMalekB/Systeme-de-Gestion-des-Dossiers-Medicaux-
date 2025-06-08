@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import LayoutDashboard from '@/components/LayoutDashboard'
 
 export default function DashboardAdmin() {
   const router = useRouter();
@@ -30,8 +31,14 @@ export default function DashboardAdmin() {
   if (!autorisé) return null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-sky-100 text-gray-800">
-      <h1 className="text-4xl font-bold">Bienvenue dans le dashboard admin</h1>
-    </main>
+    <LayoutDashboard>
+      <h2 className="text-2xl font-bold mb-4">Bienvenue Admin</h2>
+      <p>Ici, vous pouvez gérer les patients, utilisateurs et rendez-vous.</p>
+    </LayoutDashboard>
   );
+ 
+
+
+    
+
 }
