@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LayoutDashboard from '@/components/LayoutDashboard'
+import LogoutButton from "@/components/LogoutButton";
 
 export default function DashboardMedecin() {
   const router = useRouter();
-  const [autorisé, setAutorisé] = useState(false);
+  const [autorise, setAutorise] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,7 +21,7 @@ export default function DashboardMedecin() {
     })
       .then((res) => {
         if (res.ok) {
-          setAutorisé(true);
+          setAutorise(true);
         } else {
           router.push("/login");
         }
@@ -28,7 +29,7 @@ export default function DashboardMedecin() {
       .catch(() => router.push("/login"));
   }, [router]);
 
-  if (!autorisé) return null;
+  if (!autorise) return null;
 
   return (
      <LayoutDashboard>

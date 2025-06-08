@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import LogoutButton from './LogoutButton'
 
 export default function Header() {
   const router = useRouter()
@@ -20,12 +21,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow px-6 py-4 flex justify-between items-center">
       <h1 className="text-lg font-semibold">Tableau de bord {role}</h1>
-      <button
-        onClick={handleLogout}
-        className="text-red-500 hover:underline"
-      >
-        Déconnexion
-      </button>
+      <LogoutButton/>
     </header>
   )
 }

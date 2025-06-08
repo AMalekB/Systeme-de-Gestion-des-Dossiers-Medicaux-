@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LayoutDashboard from '@/components/LayoutDashboard'
+import LayoutDashboard from "@/components/LayoutDashboard";
 
 export default function DashboardAdmin() {
   const router = useRouter();
-  const [autorisé, setAutorisé] = useState(false);
+  const [autorise, setAutorise] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,7 +20,7 @@ export default function DashboardAdmin() {
     })
       .then((res) => {
         if (res.ok) {
-          setAutorisé(true);
+          setAutorise(true);
         } else {
           router.push("/login");
         }
@@ -28,13 +28,13 @@ export default function DashboardAdmin() {
       .catch(() => router.push("/login"));
   }, [router]);
 
-  if (!autorisé) return null;
+  if (!autorise) return null;
 
   return (
     <LayoutDashboard>
-      <h2 className="text-2xl font-bold mb-4">Bienvenue Admin</h2>
-      <p>Ici, vous pouvez gérer les patients, utilisateurs et rendez-vous.</p>
-    </LayoutDashboard>
+          <h2 className="text-2xl font-bold mb-4">Bienvenue Admin</h2>
+          <p>Ici, vous pouvez consulter tous. </p>
+        </LayoutDashboard>
   );
  
 
