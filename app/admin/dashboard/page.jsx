@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { decodeToken } from "@/lib/auth";
 import LogoutButton from "@/components/LogoutButton";
 
 export default function DashboardAdmin() {
   const router = useRouter();
   const [autorise, setAutorise] = useState(false);
+  const [medecins, setMedecins] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -14,18 +16,18 @@ export default function DashboardAdmin() {
       router.push("/login");
       return;
     }
+    const user = decodeToken(token);
+    if (!user || user.role !== "ADMIN") {
+      router.push("/login");
+      return;
+    }
+    setAutorise(true);
 
-    fetch("/api/admin/dashboard", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (res.ok) {
-          setAutorise(true);
-        } else {
-          router.push("/login");
-        }
-      })
-      .catch(() => router.push("/login"));
+    // → Fetch des médecins une fois autorisé
+    fetch("/api/medecins")
+      .then((res) => res.json())
+      .then((data) => setMedecins(data))
+      .catch(console.error);
   }, [router]);
 
   if (!autorise) return null;
@@ -37,11 +39,26 @@ export default function DashboardAdmin() {
         <LogoutButton />
       </header>
 
-      <section className="flex flex-col items-center justify-center p-8">
-        <h2 className="text-4xl font-semibold mb-4">
-          Bienvenue dans le dashboard admin
-        </h2>
-        {/* Ici tu pourras ajouter les widgets : liste de médecins, rendez-vous, etc. */}
+      <section className="p-8 max-w-4xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-4">Liste des médecins</h2>
+        <table className="w-full table-auto border-collapse bg-white shadow-sm">
+          <thead>
+            <tr className="bg-gray-200 text-left">
+              <th className="p-3 border">ID</th>
+              <th className="p-3 border">Nom</th>
+              <th className="p-3 border">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {medecins.map((m) => (
+              <tr key={m.id} className="hover:bg-gray-50">
+                <td className="p-3 border">{m.id}</td>
+                <td className="p-3 border">{m.nom}</td>
+                <td className="p-3 border">{m.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
     </main>
   );
