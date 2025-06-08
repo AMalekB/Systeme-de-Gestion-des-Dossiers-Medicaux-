@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function DashboardAdmin() {
   const router = useRouter();
-  const [autorisé, setAutorisé] = useState(false);
+  const [autorise, setAutorise] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -19,7 +20,7 @@ export default function DashboardAdmin() {
     })
       .then((res) => {
         if (res.ok) {
-          setAutorisé(true);
+          setAutorise(true);
         } else {
           router.push("/login");
         }
@@ -27,11 +28,21 @@ export default function DashboardAdmin() {
       .catch(() => router.push("/login"));
   }, [router]);
 
-  if (!autorisé) return null;
+  if (!autorise) return null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-sky-100 text-gray-800">
-      <h1 className="text-4xl font-bold">Bienvenue dans le dashboard admin</h1>
+    <main className="min-h-screen bg-sky-100 text-gray-800">
+      <header className="flex items-center justify-between p-6 bg-white shadow-md">
+        <h1 className="text-3xl font-bold">Dashboard Admin</h1>
+        <LogoutButton />
+      </header>
+
+      <section className="flex flex-col items-center justify-center p-8">
+        <h2 className="text-4xl font-semibold mb-4">
+          Bienvenue dans le dashboard admin
+        </h2>
+        {/* Ici tu pourras ajouter les widgets : liste de médecins, rendez-vous, etc. */}
+      </section>
     </main>
   );
 }
