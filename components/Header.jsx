@@ -20,7 +20,7 @@ export default function Header() {
 
   return (
     <header className="bg-white text-black shadow px-6 py-4 flex justify-between items-center">
-      <h1 className="text-lg text-black font-semibold">Tableau de bord {role}</h1>
+      <h1 className="text-lg font-semibold">Tableau de bord {role}</h1>
       <LogoutButton/>
     </header>
   )

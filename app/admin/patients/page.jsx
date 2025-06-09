@@ -6,8 +6,7 @@ export default function AdminPatientsPage() {
     <LayoutDashboard>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl text-black font-bold">Liste des patients</h2>
-        
-      </div>
+         </div>
       <PatientTable/>
     </LayoutDashboard>
   )
