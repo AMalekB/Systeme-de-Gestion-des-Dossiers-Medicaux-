@@ -31,9 +31,9 @@ export default function DashboardAdmin() {
   if (!autorise) return null;
 
   return (
-    <LayoutDashboard>
-          <h2 className="text-2xl font-bold mb-4">Bienvenue Admin</h2>
-          <p>Ici, vous pouvez consulter tous. </p>
+    <LayoutDashboard >
+          <h2 className="text-2xl text-black font-bold mb-4">Bienvenue Admin</h2>
+          <p className="text-black">Ici, vous pouvez consulter tous. </p>
         </LayoutDashboard>
   );
  
