@@ -103,7 +103,7 @@ model RendezVous {
   patientId        Int
   medecinId        Int
 
-  patient          Patient     @relation(fields: [patientId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
   medecin          Medecin     @relation(fields: [medecinId], references: [id])
 }
 
