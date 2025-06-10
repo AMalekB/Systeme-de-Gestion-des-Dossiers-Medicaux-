@@ -20,10 +20,12 @@ export async function GET(req) {
     orderBy: { date: 'asc' }
   })
 
+  console.log("✅ Renvoi rendezvous :", rendezvous)  // Ajoute ceci
+
   return NextResponse.json(rendezvous)
 }
 
-// ➕ POST : Ajouter un rendez-vous
+// 🔄 POST : Créer un nouveau rendez-vous
 export async function POST(req) {
   const { error } = verifyJwtAndRole(req, 'ADMIN')
   if (error) return error
@@ -37,8 +39,8 @@ export async function POST(req) {
       heure,
       typeConsultation,
       rappel,
-      patientId,
-      medecinId,
+      patientId: parseInt(patientId),    // 🔁 Convertir en Int
+      medecinId: parseInt(medecinId),    // 🔁 Convertir en Int
     }
   })
 
