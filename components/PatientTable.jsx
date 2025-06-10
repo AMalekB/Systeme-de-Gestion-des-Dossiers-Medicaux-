@@ -60,6 +60,7 @@ export default function PatientTable() {
         + Ajouter un patient
       </button>
 
+
       <table className="min-w-full bg-white rounded-xl shadow">
         <thead>
           <tr className="bg-blue-100 text-blue-800">
@@ -68,6 +69,7 @@ export default function PatientTable() {
             <th className="py-2 px-4 text-left">Date de naissance</th>
             <th className="py-2 px-4 text-left">Téléphone</th>
             <th className="py-2 px-4 text-left">Adresse</th>
+            <th className="py-2 px-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
