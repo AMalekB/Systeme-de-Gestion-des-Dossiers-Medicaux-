@@ -16,7 +16,7 @@ export default function Sidebar() {
     { label: 'Dashboard', path: '/admin/dashboard' },
     { label: 'Patients', path: '/admin/patients' },
     { label: 'Dossiers médicaux', path: '/admin/dossiers' },
-    { label: 'Utilisateurs', path: '/admin/utilisateurs' },
+    { label: 'Utilisateurs', path: '/admin/medecins' },
     { label: 'Rendez-vous', path: '/admin/rendezvous' },
     { label: 'Statistiques', path: '/admin/statistiques' },
   ],
