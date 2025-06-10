@@ -19,16 +19,16 @@ model Utilisateur {
 }
 
 model Patient {
-  id            Int              @id @default(autoincrement())
-  nom           String
-  prenom        String
-  dateNaissance DateTime
-  adresse       String
-  telephone     String
+  id              Int              @id @default(autoincrement())
+  nom             String
+  prenom          String
+  dateNaissance   DateTime
+  adresse         String
+  telephone       String
 
-  dossiers      DossierMedical[]
-  rendezVous    RendezVous[]
-  allergies     Allergie[]       // relation 1:N avec Allergie
+  dossierMedical  DossierMedical?
+  rendezVous      RendezVous[]
+  allergies       Allergie[]       // relation 1:N avec Allergie
 }
 
 model Allergie {
@@ -56,17 +56,19 @@ model Administrateur {
 }
 
 model DossierMedical {
-  id             Int           @id @default(autoincrement())
-  historique     String
-  notesMedic     String
+  id                 Int             @id @default(autoincrement())
+  historiqueMedical  String
+  notesMedecin       String
 
-  patientId      Int
-  medecinId      Int
+  patientId          Int             @unique
+  medecinId          Int
 
-  patient        Patient       @relation(fields: [patientId], references: [id])
-  medecin        Medecin       @relation(fields: [medecinId], references: [id])
+  patient            Patient         @relation(fields: [patientId], references: [id])
+  medecin            Medecin         @relation(fields: [medecinId], references: [id])
 
-  prescriptions  Prescription[]
+  prescriptions      Prescription[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
 model Prescription {
@@ -101,7 +103,7 @@ model RendezVous {
   patientId        Int
   medecinId        Int
 
-  patient          Patient     @relation(fields: [patientId], references: [id])
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
   medecin          Medecin     @relation(fields: [medecinId], references: [id])
 }
 
