@@ -1,12 +1,11 @@
-// 📄 MedecinsList.jsx
 'use client'
 import { useEffect, useState } from 'react'
 import MedecinModal from './MedecinModal'
-import MedecinForm from './MedecinForm'
 
 export default function MedecinsList() {
   const [medecins, setMedecins] = useState([])
   const [editing, setEditing] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const fetchMedecins = async () => {
     const token = localStorage.getItem('token')
@@ -37,6 +36,7 @@ export default function MedecinsList() {
 
   const handleEdit = (medecin) => {
     setEditing(medecin)
+    setIsModalOpen(true)
   }
 
   const handleFormSubmit = async (formData) => {
@@ -50,7 +50,6 @@ export default function MedecinsList() {
         },
         body: JSON.stringify(formData),
       })
-      setEditing(null)
     } else {
       await fetch('/api/medecin', {
         method: 'POST',
@@ -61,27 +60,27 @@ export default function MedecinsList() {
         body: JSON.stringify(formData),
       })
     }
+
+    setEditing(null)
+    setIsModalOpen(false)
     fetchMedecins()
+  }
+
+  const handleCancel = () => {
+    setEditing(null)
+    setIsModalOpen(false)
   }
 
   return (
     <div className="bg-gray-50 p-6 rounded-xl shadow">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Liste des médecins</h2>
 
-      {!editing && (
-        <MedecinModal onSubmit={handleFormSubmit} />
-      )}
-
-      {editing && (
-        <div className="mb-6 bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Modifier le médecin</h3>
-          <MedecinForm
-            onSubmit={handleFormSubmit}
-            medecin={editing}
-            onCancel={() => setEditing(null)}
-          />
-        </div>
-      )}
+      <MedecinModal
+        onSubmit={handleFormSubmit}
+        medecin={editing}
+        isOpen={isModalOpen}
+        onCancel={handleCancel}
+      />
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white rounded-xl shadow">
