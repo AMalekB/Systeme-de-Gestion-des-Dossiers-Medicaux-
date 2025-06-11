@@ -1,32 +1,55 @@
-// ✅ PatientTable.jsx - Liste, Ajout, Édition, Suppression
 'use client'
 import { useEffect, useState } from 'react'
 import PatientModal from './PatientModal'
 
 export default function PatientTable() {
   const [patients, setPatients] = useState([])
+  const [filteredPatients, setFilteredPatients] = useState([])
+  const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState(null)
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+
   // 🔄 Charger la liste des patients
   const fetchPatients = async () => {
-    const res = await fetch('/api/patients')
+    const res = await fetch('/api/patients', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     const data = await res.json()
     setPatients(data)
+    setFilteredPatients(data)
   }
 
   useEffect(() => {
     fetchPatients()
   }, [])
 
-  // ✅ Ajouter ou modifier un patient
+  // 🔍 Filtrage dynamique : nom, prénom, téléphone, adresse
+  useEffect(() => {
+    const lowerSearch = search.toLowerCase()
+    const filtered = patients.filter((p) =>
+      p.nom.toLowerCase().includes(lowerSearch) ||
+      p.prenom.toLowerCase().includes(lowerSearch) ||
+      p.telephone.includes(search) ||
+      p.adresse.toLowerCase().includes(lowerSearch)
+    )
+    setFilteredPatients(filtered)
+  }, [search, patients])
+
+  // ✅ Ajouter ou modifier
   const handleSave = async (formData) => {
     const method = selectedPatient ? 'PUT' : 'POST'
     const url = selectedPatient ? `/api/patients/${selectedPatient.id}` : '/api/patients'
 
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(formData),
     })
 
@@ -39,11 +62,17 @@ export default function PatientTable() {
     }
   }
 
-  // ❌ Supprimer un patient
+  // ❌ Supprimer
   const handleDelete = async (id) => {
     if (!confirm('Confirmer la suppression ?')) return
 
-    const res = await fetch(`/api/patients/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/patients/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
     if (res.ok) {
       await fetchPatients()
     } else {
@@ -53,13 +82,22 @@ export default function PatientTable() {
 
   return (
     <div className="overflow-x-auto text-gray-800">
-      <button
-        onClick={() => { setShowModal(true); setSelectedPatient(null) }}
-        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        + Ajouter un patient
-      </button>
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => { setShowModal(true); setSelectedPatient(null) }}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Ajouter un patient
+        </button>
 
+        <input
+          type="text"
+          placeholder="Recherche (nom, prénom, téléphone, adresse)..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border px-4 py-2 rounded w-80"
+        />
+      </div>
 
       <table className="min-w-full bg-white rounded-xl shadow">
         <thead>
@@ -73,7 +111,7 @@ export default function PatientTable() {
           </tr>
         </thead>
         <tbody>
-          {patients.map((p) => (
+          {filteredPatients.map((p) => (
             <tr key={p.id} className="border-t">
               <td className="py-2 px-4">{p.nom}</td>
               <td className="py-2 px-4">{p.prenom}</td>
