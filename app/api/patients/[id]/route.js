@@ -16,14 +16,14 @@ export async function PUT(req, { params }) {
       data: {
         nom,
         prenom,
-        dateNaissance: new Date(dateNaissance  + 'T12:00:00'),
+        dateNaissance: new Date(dateNaissance + 'T12:00:00'),
         telephone,
         adresse,
       },
     })
     return NextResponse.json(updatedPatient)
   } catch (error) {
-    console.error(error)
+    console.error('Erreur PUT patient :', error)
     return NextResponse.json(
       { message: 'Erreur modification patient' },
       { status: 500 }
@@ -31,15 +31,24 @@ export async function PUT(req, { params }) {
   }
 }
 
-// ❌ DELETE : Supprimer un patient
+// ❌ DELETE : Supprimer un patient (et son dossier médical lié)
 export async function DELETE(_, { params }) {
   const { id } = params
 
   try {
-    await prisma.patient.delete({ where: { id: Number(id) } })
+    // Supprimer d'abord le dossier médical lié
+    await prisma.dossierMedical.deleteMany({
+      where: { patientId: Number(id) },
+    })
+
+    // Puis supprimer le patient
+    await prisma.patient.delete({
+      where: { id: Number(id) },
+    })
+
     return NextResponse.json({ message: 'Patient supprimé' })
   } catch (error) {
-    console.error(error)
+    console.error('Erreur DELETE patient :', error)
     return NextResponse.json(
       { message: 'Erreur suppression patient' },
       { status: 500 }
