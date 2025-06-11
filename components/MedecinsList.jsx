@@ -6,6 +6,8 @@ export default function MedecinsList() {
   const [medecins, setMedecins] = useState([])
   const [editing, setEditing] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [search, setSearch] = useState('') // 🔍 nouveau champ
+  const [filtered, setFiltered] = useState([])
 
   const fetchMedecins = async () => {
     const token = localStorage.getItem('token')
@@ -16,11 +18,21 @@ export default function MedecinsList() {
     })
     const data = await res.json()
     setMedecins(data)
+    setFiltered(data)
   }
 
   useEffect(() => {
     fetchMedecins()
   }, [])
+
+  useEffect(() => {
+    const lower = search.toLowerCase()
+    const filteredList = medecins.filter(m =>
+      m.utilisateur.nom.toLowerCase().includes(lower) ||
+      m.specialite.toLowerCase().includes(lower)
+    )
+    setFiltered(filteredList)
+  }, [search, medecins])
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token')
@@ -41,25 +53,20 @@ export default function MedecinsList() {
 
   const handleFormSubmit = async (formData) => {
     const token = localStorage.getItem('token')
-    if (editing) {
-      await fetch(`/api/medecin/${editing.utilisateur.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-    } else {
-      await fetch('/api/medecin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-    }
+    const url = editing
+      ? `/api/medecin/${editing.utilisateur.id}`
+      : '/api/medecin'
+
+    const method = editing ? 'PUT' : 'POST'
+
+    await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    })
 
     setEditing(null)
     setIsModalOpen(false)
@@ -72,8 +79,26 @@ export default function MedecinsList() {
   }
 
   return (
-    <div className="bg-gray-50 p-6 rounded-xl shadow">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Liste des médecins</h2>
+    <div className="overflow-x-auto text-gray-800">
+      
+
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => { setEditing(null); setIsModalOpen(true) }}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          ➕ Ajouter un médecin
+        </button>
+        <input
+          type="text"
+          placeholder="Rechercher par nom ou spécialité..."
+          className="border px-4 py-2 rounded w-80"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        
+      </div>
 
       <MedecinModal
         onSubmit={handleFormSubmit}
@@ -93,7 +118,7 @@ export default function MedecinsList() {
             </tr>
           </thead>
           <tbody>
-            {medecins.map((m, index) => (
+            {filtered.map((m, index) => (
               <tr key={m.utilisateur.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                 <td className="p-3 border-b border-gray-300 text-gray-800">{m.utilisateur.nom}</td>
                 <td className="p-3 border-b border-gray-300 text-gray-800">{m.utilisateur.email}</td>
