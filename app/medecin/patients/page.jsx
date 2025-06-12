@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LayoutDashboard from "@/components/LayoutDashboard";
-import LogoutButton from "@/components/LogoutButton";
 
 export default function MesPatientsPage() {
   const router = useRouter();
@@ -24,7 +23,9 @@ export default function MesPatientsPage() {
       .then((res) => {
         if (!res.ok) throw new Error("Non autorisé");
         setAutorise(true);
-        return fetch("/api/patients");
+        return fetch("/api/patients", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       })
       .then((res) => {
         if (!res.ok) throw new Error("Erreur chargement patients");
@@ -33,6 +34,10 @@ export default function MesPatientsPage() {
       .then(setPatients)
       .catch(() => router.push("/login"));
   }, [router]);
+
+  const handleVoirDossier = (patientId) => {
+    router.push(`/medecin/dossiers/${patientId}`);
+  };
 
   if (!autorise) return null;
 
@@ -54,6 +59,8 @@ export default function MesPatientsPage() {
                 <th className="p-3 border">Nom</th>
                 <th className="p-3 border">Prénom</th>
                 <th className="p-3 border">Date de naissance</th>
+                <th className="p-3 border">Actions</th>{" "}
+                {/* Ajout colonne Actions */}
               </tr>
             </thead>
             <tbody>
@@ -65,11 +72,19 @@ export default function MesPatientsPage() {
                   <td className="p-3 border">
                     {new Date(p.dateNaissance).toLocaleDateString()}
                   </td>
+                  <td className="p-3 border">
+                    <button
+                      onClick={() => handleVoirDossier(p.id)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                    >
+                      Voir dossier
+                    </button>
+                  </td>
                 </tr>
               ))}
               {patients.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-gray-500">
+                  <td colSpan={5} className="p-4 text-center text-gray-500">
                     Aucun patient trouvé.
                   </td>
                 </tr>
