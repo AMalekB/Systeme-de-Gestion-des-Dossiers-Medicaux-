@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
   const { error, payload } = verifyJwtAndRole(request, "MEDECIN");
   if (error) return error;
 
-  const id = Number(params.id);
+  const id = Number(params.patientId);
   try {
     const patient = await prisma.patient.findUnique({
       where: { id },

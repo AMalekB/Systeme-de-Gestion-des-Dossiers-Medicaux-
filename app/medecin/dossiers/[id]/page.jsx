@@ -13,6 +13,21 @@ export default function DossierMedicalPage() {
 
   const patientId = params.id;
 
+  const chargerPatient = async (token) => {
+    try {
+      const res = await fetch(`/api/patients/${patientId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Erreur chargement dossier patient");
+      const data = await res.json();
+      setPatient(data);
+      setIsLoading(false);
+    } catch {
+      router.push("/login");
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -20,24 +35,14 @@ export default function DossierMedicalPage() {
       return;
     }
 
-    // Vérifier le rôle
+    // Vérifier le rôle puis charger patient
     fetch("/api/medecin/dashboard", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("Non autorisé");
         setAutorise(true);
-        return fetch(`/api/patients/${patientId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erreur chargement dossier patient");
-        return res.json();
-      })
-      .then((data) => {
-        setPatient(data);
-        setIsLoading(false);
+        return chargerPatient(token);
       })
       .catch(() => router.push("/login"));
   }, [router, patientId]);
@@ -80,13 +85,11 @@ export default function DossierMedicalPage() {
         <h3 className="text-xl font-semibold mb-3 text-black">
           Historique médical
         </h3>
-        {/* Exemple : à enrichir avec les vraies données du dossier */}
         <p>{patient.historique || "Aucun historique disponible."}</p>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h3 className="text-xl font-semibold mb-3 text-black">Prescriptions</h3>
-        {/* Exemple : afficher les prescriptions si ton API les renvoie */}
         {patient.prescriptions && patient.prescriptions.length > 0 ? (
           <ul className="list-disc pl-5">
             {patient.prescriptions.map((prescription) => (
@@ -99,6 +102,60 @@ export default function DossierMedicalPage() {
         ) : (
           <p>Aucune prescription disponible.</p>
         )}
+      </div>
+
+      {/* Formulaire Ajouter une prescription */}
+      <div className="bg-white p-6 rounded-xl shadow-md mt-6">
+        <h3 className="text-xl font-semibold mb-3 text-black">
+          Ajouter une prescription
+        </h3>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+
+            const token = localStorage.getItem("token");
+            const description = e.target.description.value;
+
+            const res = await fetch(
+              `/api/patients/${patientId}/prescriptions`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ description }),
+              }
+            );
+
+            console.log("POST /prescriptions status:", res.status);
+
+            if (res.ok) {
+              await chargerPatient(token); // recharger le patient après ajout
+              e.target.reset();
+            } else {
+              alert("Erreur lors de l'ajout de la prescription.");
+            }
+          }}
+        >
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <input
+              type="text"
+              name="description"
+              required
+              className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+          >
+            Ajouter
+          </button>
+        </form>
       </div>
     </LayoutDashboard>
   );
