@@ -1,113 +1,116 @@
 const { PrismaClient } = require('@prisma/client');
+const faker = require('@faker-js/faker').fakerFR_CA;
+
 const prisma = new PrismaClient();
 
 async function main() {
-  // Création d'utilisateurs
-  const adminUser = await prisma.utilisateur.create({
-    data: {
-      nom: 'Admin User',
-      email: 'admin@example.com',
-      motDePasse: 'adminpass', // En prod, hacher le mdp
-      role: 'ADMIN',
-      administrateur: {
-        create: {}
-      }
-    }
+  // Admin
+  const existingAdmin = await prisma.utilisateur.findUnique({
+    where: { email: 'admin@example.com' }
   });
 
-  const medecinUser = await prisma.utilisateur.create({
-    data: {
-      nom: 'Dr. Martin',
-      email: 'martin@example.com',
-      motDePasse: 'medpass',
-      role: 'MEDECIN',
-      medecin: {
-        create: {
-          specialite: 'Cardiologie'
+  let adminUser;
+  if (!existingAdmin) {
+    adminUser = await prisma.utilisateur.create({
+      data: {
+        nom: 'Admin User',
+        email: 'admin@example.com',
+        motDePasse: 'adminpass',
+        role: 'ADMIN',
+        administrateur: {
+          create: {}
         }
       }
-    }
+    });
+  } else {
+    adminUser = existingAdmin;
+  }
+
+  // Médecin de test
+  const existingMedecin = await prisma.utilisateur.findUnique({
+    where: { email: 'martin@example.com' }
   });
 
-  // Création de patients
-  const patient1 = await prisma.patient.create({
-    data: {
-      nom: 'Dupont',
-      prenom: 'Jean',
-      dateNaissance: new Date('1980-01-15'),
-      adresse: '123 Rue Principale',
-      telephone: '0612345678',
-      allergies: {
-        create: [
-          { nom: 'Pollen' },
-          { nom: 'Penicilline' }
-        ]
+  let medecinUser;
+  if (!existingMedecin) {
+    medecinUser = await prisma.utilisateur.create({
+      data: {
+        nom: 'Dr. Martin',
+        email: 'martin@example.com',
+        motDePasse: 'medpass',
+        role: 'MEDECIN',
+        medecin: {
+          create: {
+            specialite: 'Cardiologie'
+          }
+        }
+      },
+      include: { medecin: true }
+    });
+  } else {
+    medecinUser = await prisma.utilisateur.findUnique({
+      where: { email: 'martin@example.com' },
+      include: { medecin: true }
+    });
+  }
+
+  // 20 médecins aléatoires
+  for (let i = 0; i < 20; i++) {
+    const email = faker.internet.email().toLowerCase();
+    const exists = await prisma.utilisateur.findUnique({ where: { email } });
+
+    if (!exists) {
+      await prisma.utilisateur.create({
+        data: {
+          nom: `Dr. ${faker.person.lastName()}`,
+          email: email,
+          motDePasse: 'medpass',
+          role: 'MEDECIN',
+          medecin: {
+            create: {
+              specialite: faker.person.jobType()
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // 100 patients
+  for (let i = 0; i < 100; i++) {
+    const city = faker.helpers.arrayElement(['Ottawa', 'Gatineau']);
+    const province = city === 'Ottawa' ? 'ON' : 'QC';
+    const adresse = `${faker.location.streetAddress()}, ${city}, ${province}, ${faker.location.zipCode()}`;
+
+    const patient = await prisma.patient.create({
+      data: {
+        nom: faker.person.lastName(),
+        prenom: faker.person.firstName(),
+        dateNaissance: faker.date.birthdate({ min: 1950, max: 2005, mode: 'year' }),
+        adresse: adresse,
+        telephone: faker.phone.number('(###) ###-####'),
+        allergies: {
+          create: [
+            { nom: faker.word.noun() }
+          ]
+        }
       }
-    }
-  });
+    });
 
-  const patient2 = await prisma.patient.create({
-    data: {
-      nom: 'Martin',
-      prenom: 'Claire',
-      dateNaissance: new Date('1990-07-20'),
-      adresse: '456 Avenue des Champs',
-      telephone: '0698765432'
-    }
-  });
-
-  // Création d'un dossier médical lié au patient1 et médecin
-  const dossier1 = await prisma.dossierMedical.create({
-    data: {
-      historique: "Patient avec antécédents d'hypertension.",
-      notesMedic: 'Suivi régulier conseillé.',
-      patientId: patient1.id,
-      medecinId: medecinUser.medecin.id,
-    }
-  });
-
-  // Création de médicaments
-  const med1 = await prisma.medicament.create({
-    data: {
-      nom: 'Aspirine',
-      dosage: '100 mg',
-      duree: '10 jours',
-    }
-  });
-
-  const med2 = await prisma.medicament.create({
-    data: {
-      nom: 'Ibuprofène',
-      dosage: '200 mg',
-      duree: '5 jours',
-    }
-  });
-
-  // Création d'une prescription liée au dossier et médecin, avec médicaments
-  const prescription1 = await prisma.prescription.create({
-    data: {
-      date: new Date(),
-      dossierId: dossier1.id,
-      medecinId: medecinUser.medecin.id,
-      medicaments: {
-        connect: [{ id: med1.id }, { id: med2.id }]
+    // Dossier médical avec champs requis
+    await prisma.dossierMedical.create({
+      data: {
+        historiqueMedical: faker.lorem.sentence(),
+        notesMedecin: faker.lorem.sentences(2),
+        patientId: patient.id,
+        medecinId: medecinUser.medecin.id
       }
-    }
-  });
+    });
 
-  // Création d'un rendez-vous
-  const rdv1 = await prisma.rendezVous.create({
-    data: {
-      date: new Date('2025-06-15'),
-      heure: '14:30',
-      typeConsultation: 'Consultation générale',
-      rappel: true,
-      patientId: patient1.id,
-      medecinId: medecinUser.medecin.id,
-    }
-  });
+    console.log(`👤 Patient ${i + 1}/100 ajouté`);
+  }
 
-  console.log('Seed terminé avec succès !');
+  console.log('✅ Données générées avec succès !');
 }
 
 main()
