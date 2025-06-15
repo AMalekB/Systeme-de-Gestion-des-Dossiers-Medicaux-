@@ -59,7 +59,7 @@ export default function MesPatientsPage() {
                 <th className="p-3 border">Nom</th>
                 <th className="p-3 border">Prénom</th>
                 <th className="p-3 border">Date de naissance</th>
-                <th className="p-3 border">Actions</th>{" "}
+                <th className="p-3 border">Actions</th>
                 {/* Ajout colonne Actions */}
               </tr>
             </thead>
