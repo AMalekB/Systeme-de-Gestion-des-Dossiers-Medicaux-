@@ -19,69 +19,68 @@ model Utilisateur {
 }
 
 model Patient {
-  id              Int              @id @default(autoincrement())
-  nom             String
-  prenom          String
-  dateNaissance   DateTime
-  adresse         String
-  telephone       String
+  id             Int              @id @default(autoincrement())
+  nom            String
+  prenom         String
+  dateNaissance  DateTime
+  adresse        String
+  telephone      String
 
-  dossierMedical  DossierMedical?
-  rendezVous      RendezVous[]
-  allergies       Allergie[]       // relation 1:N avec Allergie
+  // One-to-one avec DossierMedical
+  dossierMedical DossierMedical?  // relation inversée
+  allergies      Allergie[]
+  rendezVous     RendezVous[]
 }
 
 model Allergie {
   id        Int     @id @default(autoincrement())
   nom       String
-  patientId Int
   patient   Patient @relation(fields: [patientId], references: [id])
+  patientId Int
 }
 
 model Medecin {
   id             Int           @id @default(autoincrement())
   specialite     String
-  utilisateurId  Int           @unique
   utilisateur    Utilisateur   @relation(fields: [utilisateurId], references: [id])
+  utilisateurId  Int           @unique
 
-  dossiers       DossierMedical[]
   prescriptions  Prescription[]
   rendezVous     RendezVous[]
 }
 
 model Administrateur {
-  id             Int           @id @default(autoincrement())
-  utilisateurId  Int           @unique
-  utilisateur    Utilisateur   @relation(fields: [utilisateurId], references: [id])
+  id            Int           @id @default(autoincrement())
+  utilisateur   Utilisateur   @relation(fields: [utilisateurId], references: [id])
+  utilisateurId Int           @unique
 }
 
 model DossierMedical {
-  id                 Int             @id @default(autoincrement())
-  historiqueMedical  String
-  notesMedecin       String
+  id                Int             @id @default(autoincrement())
+  historiqueMedical String?
+  notesMedecin      String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-  patientId          Int             @unique
-  medecinId          Int
-
-  patient            Patient         @relation(fields: [patientId], references: [id])
-  medecin            Medecin         @relation(fields: [medecinId], references: [id])
+  // Fichier unique par patient
+  patient   Patient @relation(fields: [patientId], references: [id])
+  patientId Int     @unique
 
   prescriptions      Prescription[]
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
 }
 
 model Prescription {
-  id             Int           @id @default(autoincrement())
-  date           DateTime
+  id           Int            @id @default(autoincrement())
+  date         DateTime
+  description  String?
 
-  dossierId      Int
-  medecinId      Int
+  // On conserve la référence au médecin qui l’a émise
+  dossier      DossierMedical @relation(fields: [dossierId], references: [id])
+  dossierId    Int
+  medecin      Medecin        @relation(fields: [medecinId], references: [id])
+  medecinId    Int
 
-  dossier        DossierMedical @relation(fields: [dossierId], references: [id])
-  medecin        Medecin        @relation(fields: [medecinId], references: [id])
-
-  medicaments    Medicament[]   @relation("PrescriptionMedicament")
+  medicaments  Medicament[]   @relation("PrescriptionMedicament")
 }
 
 model Medicament {
@@ -94,17 +93,17 @@ model Medicament {
 }
 
 model RendezVous {
-  id               Int         @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   date             DateTime
   heure            String
   typeConsultation String
   rappel           Boolean
 
-  patientId        Int
-  medecinId        Int
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId Int
 
-  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  medecin          Medecin     @relation(fields: [medecinId], references: [id])
+  medecin   Medecin @relation(fields: [medecinId], references: [id])
+  medecinId Int
 }
 
 enum Role {

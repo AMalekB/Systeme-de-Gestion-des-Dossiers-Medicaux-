@@ -1,45 +1,52 @@
+// app/api/patients/[patientId]/prescriptions/route.js
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyJwtAndRole } from "@/lib/auth";
 
-export async function POST(req, context) {
-  // Correction App Router
-  const params = await context.params;
-  const patientId = parseInt(params.id, 10);
+export async function POST(request, context) {
+  // 1️⃣ Lire le paramètre dynamic
+  const { patientId: patientIdStr } = await context.params;
+  const patientId = parseInt(patientIdStr, 10);
 
-  // Correction verifyJwtAndRole
-  const { error, payload } = verifyJwtAndRole(req, "MEDECIN");
-
+  // 2️⃣ Authentifier + vérifier rôle
+  const { error, payload } = verifyJwtAndRole(request, "MEDECIN");
   if (error) return error;
 
-  try {
-    const body = await req.json();
+  // → Récupère l’ID du médecin depuis le token (assure-toi que ton JWT contient bien userId)
+  const medecinId = payload.userId || payload.id;
 
-    // Récupérer le dossier médical du patient pour ce médecin
-    const dossier = await prisma.dossierMedical.findFirst({
-      where: { patientId, medecinId: payload.userId },
+  try {
+    // 3️⃣ Lecture de la description
+    const { description } = await request.json();
+
+    // 4️⃣ Cherche ou crée le dossier – UNIQUEMENT via patientId
+    let dossier = await prisma.dossierMedical.findUnique({
+      where: { patientId },
     });
 
     if (!dossier) {
-      return NextResponse.json(
-        { message: "Dossier non trouvé" },
-        { status: 404 }
-      );
+      dossier = await prisma.dossierMedical.create({
+        data: {
+          patientId,
+          historiqueMedical: "",
+          notesMedecin: "",
+        },
+      });
     }
 
-    // Créer la prescription
+    // 5️⃣ Création de la prescription (ici medecinId existe toujours sur Prescription)
     const newPrescription = await prisma.prescription.create({
       data: {
         date: new Date(),
-        description: body.description,
+        description,
         dossierId: dossier.id,
-        medecinId: payload.userId,
+        medecinId,
       },
     });
 
     return NextResponse.json(newPrescription, { status: 201 });
-  } catch (error) {
-    console.error("Erreur POST /prescriptions :", error);
+  } catch (err) {
+    console.error("Erreur POST /prescriptions :", err);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }
