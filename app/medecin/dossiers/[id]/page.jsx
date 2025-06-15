@@ -35,7 +35,6 @@ export default function DossierMedicalPage() {
       return;
     }
 
-    // Vérifier le rôle puis charger patient
     fetch("/api/medecin/dashboard", {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -57,6 +56,9 @@ export default function DossierMedicalPage() {
         <p>Patient non trouvé.</p>
       </LayoutDashboard>
     );
+
+  // Récupère les prescriptions depuis le dossier
+  const prescriptions = patient.dossierMedical?.prescriptions || [];
 
   return (
     <LayoutDashboard>
@@ -85,17 +87,20 @@ export default function DossierMedicalPage() {
         <h3 className="text-xl font-semibold mb-3 text-black">
           Historique médical
         </h3>
-        <p>{patient.historique || "Aucun historique disponible."}</p>
+        <p>
+          {patient.dossierMedical?.historiqueMedical ||
+            "Aucun historique disponible."}
+        </p>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md">
+      <div className="bg-white p-6 rounded-xl shadow-md mb-6">
         <h3 className="text-xl font-semibold mb-3 text-black">Prescriptions</h3>
-        {patient.prescriptions && patient.prescriptions.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {patient.prescriptions.map((prescription) => (
-              <li key={prescription.id}>
-                {new Date(prescription.date).toLocaleDateString()} -{" "}
-                {prescription.description}
+        {prescriptions.length > 0 ? (
+          <ul className="list-disc pl-5 text-black">
+            {prescriptions.map((presc) => (
+              <li key={presc.id}>
+                {new Date(presc.date).toLocaleDateString()} -{" "}
+                {presc.description}
               </li>
             ))}
           </ul>
@@ -104,7 +109,6 @@ export default function DossierMedicalPage() {
         )}
       </div>
 
-      {/* Formulaire Ajouter une prescription */}
       <div className="bg-white p-6 rounded-xl shadow-md mt-6">
         <h3 className="text-xl font-semibold mb-3 text-black">
           Ajouter une prescription
@@ -131,7 +135,7 @@ export default function DossierMedicalPage() {
             console.log("POST /prescriptions status:", res.status);
 
             if (res.ok) {
-              await chargerPatient(token); // recharger le patient après ajout
+              await chargerPatient(token);
               e.target.reset();
             } else {
               alert("Erreur lors de l'ajout de la prescription.");
