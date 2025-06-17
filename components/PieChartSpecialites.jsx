@@ -10,38 +10,37 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function PieChartSpecialites() {
+export default function PieChartSpecialites({ startDate, endDate, refreshKey }) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch("/api/stats/rendezvous-par-specialite")
-      .then((res) => res.json())
-      .then((data) => {
+    if (!startDate || !endDate) return;
+    const from = startDate.toISOString();
+    const to = endDate.toISOString();
+
+    fetch(`/api/stats/rendezvous-par-specialite?from=${from}&to=${to}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject("Erreur serveur")))
+      .then((result) => {
         setData({
-          labels: data.map((item) => item.specialite || "Non spécifiée"),
+          labels: result.map((r) => r.specialite),
           datasets: [
             {
-              data: data.map((item) => item.count),
-              backgroundColor: [
-                "#36A2EB",
-                "#FF6384",
-                "#FFCE56",
-                "#4BC0C0",
-                "#9966FF",
-                "#FF9F40",
-              ],
+              data: result.map((r) => r.count),
+              backgroundColor: ["#36A2EB", "#FF6384", "#FFCE56", "#4BC0C0", "#9966FF"],
             },
           ],
         });
-      });
-  }, []);
-
-  if (!data) return <p>Chargement du graphique...</p>;
+      })
+      .catch(() => setData(null));
+  }, [startDate, endDate, refreshKey]);
 
   return (
-    <div className="bg-white rounded shadow p-6">
-      <h2 className="text-xl font-semibold mb-4">Répartition des rendez-vous par spécialité</h2>
-      <Pie data={data} />
+    <div className="bg-white p-6 rounded shadow h-full flex items-center justify-center">
+      {data && data.labels.length > 0 ? (
+        <Pie data={data} />
+      ) : (
+        <p className="text-gray-500">Aucune donnée disponible pour la période sélectionnée.</p>
+      )}
     </div>
   );
 }

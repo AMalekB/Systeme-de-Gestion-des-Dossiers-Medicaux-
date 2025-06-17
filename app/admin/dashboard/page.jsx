@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LayoutDashboard from "@/components/LayoutDashboard";
-import PieChartSpecialites from "@/components/PieChartSpecialites"; 
-import TopMedecinsBarChart from "@/components/TopMedecinsBarChart";
+import StatistiquesParPeriode from "@/components/StatistiquesParPeriode";
 
+import { FaUser, FaStethoscope, FaCalendarAlt, FaFolderOpen } from "react-icons/fa";
 
 export default function DashboardAdmin() {
   const router = useRouter();
@@ -42,6 +42,30 @@ export default function DashboardAdmin() {
 
   if (!autorise) return null;
 
+  const cards = [
+    {
+      label: "Patients",
+      key: "patients",
+      icon: <FaUser className="text-blue-500 text-3xl" />,
+    },
+    {
+      label: "Médecins",
+      key: "medecins",
+      icon: <FaStethoscope className="text-green-500 text-3xl" />,
+    },
+    {
+      label: "Rendez-vous",
+      key: "rendezvous",
+      icon: <FaCalendarAlt className="text-purple-500 text-3xl" />,
+    },
+    
+    {
+  label: "Rendez-vous aujourd'hui",
+  key: "rdv aujourd'hui",
+  icon: <FaCalendarAlt className="text-orange-500 text-3xl" />,
+}
+  ];
+
   return (
     <LayoutDashboard>
       <h2 className="text-2xl text-black font-bold mb-4">Bienvenue Admin</h2>
@@ -51,20 +75,23 @@ export default function DashboardAdmin() {
       {!stats ? (
         <p className="text-gray-600">Chargement des statistiques...</p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          {Object.entries(stats).map(([key, value]) => (
-            <div key={key} className="bg-white p-4 rounded shadow">
-              <p className="text-gray-600 capitalize">{key}</p>
-              <p className="text-2xl font-semibold">{value}</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {cards.map(({ key, label, icon }) => (
+            <div
+              key={key}
+              className="bg-white p-4 rounded-xl shadow flex items-center gap-4 transition-opacity duration-700 animate-fade-in"
+            >
+              <div>{icon}</div>
+              <div>
+                <p className="text-gray-600 text-sm">{label}</p>
+                <p className="text-xl text-gray-400 font-semibold">{stats[key]}</p>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* 🥧 Diagramme circulaire par spécialité */}
-      <PieChartSpecialites />
-      {/* 📈 Graphique des médecins les plus actifs */}
-<TopMedecinsBarChart />
+      <StatistiquesParPeriode />
     </LayoutDashboard>
   );
 }
