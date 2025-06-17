@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import LayoutDashboard from "@/components/LayoutDashboard";
-import PieChartSpecialites from "@/components/PieChartSpecialites"; // Graphe circulaire
+import PieChartSpecialites from "@/components/PieChartSpecialites"; 
+import TopMedecinsBarChart from "@/components/TopMedecinsBarChart";
+
 
 export default function DashboardAdmin() {
   const router = useRouter();
@@ -61,6 +63,8 @@ export default function DashboardAdmin() {
 
       {/* 🥧 Diagramme circulaire par spécialité */}
       <PieChartSpecialites />
+      {/* 📈 Graphique des médecins les plus actifs */}
+<TopMedecinsBarChart />
     </LayoutDashboard>
   );
 }
