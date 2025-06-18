@@ -61,26 +61,55 @@ export default function RendezvousForm({ onSubmit, rendezvous = null, onCancel }
 
       <div>
         <label className="block font-medium">Heure</label>
-        <input
-          type="time"
-          name="heure"
-          value={formData.heure}
-          onChange={handleChange}
-          required
-          className="w-full border rounded px-3 py-2"
-        />
+        <select
+  name="heure"
+  value={formData.heure}
+  onChange={handleChange}
+  required
+  className="w-full border rounded px-3 py-2"
+>
+  <option value="">-- Sélectionner une heure --</option>
+  {[
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+  ].map((heure) => (
+    <option key={heure} value={heure}>
+      {heure}
+    </option>
+  ))}
+</select>
+
       </div>
 
       <div>
-        <label className="block font-medium">Type de consultation</label>
-        <input
-          type="text"
-          name="typeConsultation"
-          value={formData.typeConsultation}
-          onChange={handleChange}
-          required
-          className="w-full border rounded px-3 py-2"
-        />
+        <label className="block font-medium">Motif de consultation</label>
+        <select
+  name="typeConsultation"
+  value={formData.typeConsultation}
+  onChange={handleChange}
+  required
+  className="w-full border rounded px-3 py-2"
+>
+  <option value="">-- Sélectionner un motif --</option>
+  {[
+    "Urgence", "Vaccin", "Contrôle", "Dépistage", "Suivi", "Bilan",
+    "Consultation", "Renouvellement prescription", "Naissance", "Contraception",
+    "Grossesse", "Allaitement", "Examen", "Certificat", "Orientation",
+    "Surveillance", "Diagnostic", "Intervention", "Retrait", "Traitement",
+    "Référence", "Détresse", "Autres"
+  ].map((type) => (
+    <option key={type} value={type}>
+      {type}
+    </option>
+  ))}
+</select>
+
       </div>
 
 
