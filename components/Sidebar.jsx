@@ -39,7 +39,7 @@ export default function Sidebar() {
           <li key={item.path}>
             <button
               onClick={() => router.push(item.path)}
-              className="text-gray-700 hover:text-blue-600"
+              className="text-gray-700 hover:text-blue-600 cursor-pointer"
             >
               {item.label}
             </button>

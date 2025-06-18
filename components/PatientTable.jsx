@@ -85,7 +85,8 @@ export default function PatientTable() {
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => { setShowModal(true); setSelectedPatient(null) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+          title="Ajouter un patient"
         >
           + Ajouter un patient
         </button>
@@ -121,11 +122,11 @@ export default function PatientTable() {
               <td className="py-2 px-4 space-x-2">
                 <button
                   onClick={() => { setSelectedPatient(p); setShowModal(true) }}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline cursor-pointer"
                 >Modifier</button>
                 <button
                   onClick={() => handleDelete(p.id)}
-                  className="text-red-500 hover:underline"
+                  className="text-red-500 hover:underline cursor-pointer"
                 >Supprimer</button>
               </td>
             </tr>
