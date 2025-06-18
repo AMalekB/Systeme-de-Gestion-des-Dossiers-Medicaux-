@@ -17,7 +17,6 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Liens rapides</h3>
             <ul className="space-y-2">
               <li><Link href="#features" className="text-gray-400 hover:text-white transition-colors">Fonctionnalités</Link></li>
-              <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Tarifs</Link></li>
               <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
@@ -36,13 +35,13 @@ export default function Footer() {
             <ul className="space-y-2 text-gray-400">
               <li>Email: contact@sgdm.com</li>
               <li>Tél: +1 800 452 5265</li>
-              <li>Adresse: Ottawa, Canada</li>
+              <li>Adresse: Ottawa,ON, Canada</li>
             </ul>
           </div>
         </div>
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>© 2024 Système de Gestion des Dossiers Médicaux. Tous droits réservés.</p>
+          <p>© 2025 Système de Gestion des Dossiers Médicaux. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
