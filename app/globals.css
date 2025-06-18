@@ -41,3 +41,6 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
 }
+.fc-toolbar-title {
+  text-transform: capitalize;
+}
