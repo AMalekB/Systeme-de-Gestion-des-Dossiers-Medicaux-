@@ -73,7 +73,7 @@ export default function StatistiquesParPeriode() {
           {/* Bouton Appliquer */}
           <button
             onClick={handleApply}
-            className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 cursor-pointer"
           >
             Appliquer
           </button>
