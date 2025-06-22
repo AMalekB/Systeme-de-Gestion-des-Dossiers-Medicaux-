@@ -47,6 +47,7 @@ model Medecin {
 
   prescriptions  Prescription[]
   rendezVous     RendezVous[]
+  historique     Historique[]  // Journal des actions sur dossiers
 }
 
 model Administrateur {
@@ -56,40 +57,63 @@ model Administrateur {
 }
 
 model DossierMedical {
-  id                Int             @id @default(autoincrement())
+  id                Int               @id @default(autoincrement())
   historiqueMedical String?
   notesMedecin      String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   // Fichier unique par patient
-  patient   Patient @relation(fields: [patientId], references: [id])
-  patientId Int     @unique
+  patient   Patient       @relation(fields: [patientId], references: [id])
+  patientId Int           @unique
 
-  prescriptions      Prescription[]
+  prescriptions     Prescription[]
+  historique        Historique[]     // Entrées d'historique
 }
 
 model Prescription {
-  id           Int            @id @default(autoincrement())
-  date         DateTime
-  description  String?
+  id          Int                      @id @default(autoincrement())
+  date        DateTime                 @default(now())
+  description String?
 
-  // On conserve la référence au médecin qui l’a émise
-  dossier      DossierMedical @relation(fields: [dossierId], references: [id])
-  dossierId    Int
-  medecin      Medecin        @relation(fields: [medecinId], references: [id])
-  medecinId    Int
+  dossier     DossierMedical           @relation(fields: [dossierId], references: [id])
+  dossierId   Int
+  medecin     Medecin                  @relation(fields: [medecinId], references: [id])
+  medecinId   Int
 
-  medicaments  Medicament[]   @relation("PrescriptionMedicament")
+  items       PrescriptionMedicament[] // Lignes de prescription
 }
 
 model Medicament {
-  id             Int           @id @default(autoincrement())
-  nom            String
-  dosage         String
-  duree          String
+  id       Int                       @id @default(autoincrement())
+  nom      String                    // Nom du médicament
 
-  prescriptions  Prescription[] @relation("PrescriptionMedicament")
+  liens    PrescriptionMedicament[]  // Jointure vers prescriptions
+}
+
+model PrescriptionMedicament {
+  prescription   Prescription  @relation(fields: [prescriptionId], references: [id])
+  prescriptionId Int
+  medicament     Medicament    @relation(fields: [medicamentId], references: [id])
+  medicamentId   Int
+
+  dosage         String?
+  frequence      String?
+  duree          String?
+  instructions   String?
+
+  @@id([prescriptionId, medicamentId])
+}
+
+model Historique {
+  id           Int             @id @default(autoincrement())
+  dossier      DossierMedical  @relation(fields: [dossierId], references: [id])
+  dossierId    Int
+  medecin      Medecin         @relation(fields: [medecinId], references: [id])
+  medecinId    Int
+  date         DateTime        @default(now())
+  type         String          // ex. "prescription", "note", "modification"
+  contenu      String          // Description de l'action
 }
 
 model RendezVous {
