@@ -3,23 +3,42 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyJwtAndRole } from "@/lib/auth";
 
-export async function GET(request, context) {
-  // 1️⃣ Authentification + autorisation
+export async function GET(request, { params }) {
+  // 1️⃣ Authentification & autorisation
   const { error, payload } = verifyJwtAndRole(request, "MEDECIN");
   if (error) return error;
 
-  // 2️⃣ Récupération de l’ID (avec await context.params)
-  const params = await context.params;
+  // 2️⃣ Récupération de l'ID du patient
   const id = Number(params.patientId);
 
   try {
-    // 3️⃣ Charger le patient ET son dossier + ses prescriptions via le dossier
+    // 3️⃣ Chargement du patient avec relations
     const patient = await prisma.patient.findUnique({
       where: { id },
       include: {
         dossierMedical: {
           include: {
-            prescriptions: true, // ✅ Là où sont les prescriptions
+            prescriptions: {
+              include: {
+                medecin: {
+                  include: {
+                    utilisateur: { select: { nom: true } },
+                  },
+                },
+                items: { include: { medicament: true } },
+              },
+              orderBy: { date: "desc" },
+            },
+            historique: {
+              include: {
+                medecin: {
+                  include: {
+                    utilisateur: { select: { nom: true } },
+                  },
+                },
+              },
+              orderBy: { date: "desc" },
+            },
           },
         },
         rendezVous: true,
@@ -39,20 +58,17 @@ export async function GET(request, context) {
     console.error("Erreur GET patient :", err);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
-  
 }
-// 📝 PUT : Modifier un patient
-export async function PUT(req, { params }) {
-  const id = params.patientId;
-  const data = await req.json();
 
- 
-
+// PUT et DELETE restent inchangés
+export async function PUT(request, { params }) {
+  const id = Number(params.patientId);
+  const data = await request.json();
   const { nom, prenom, dateNaissance, telephone, adresse } = data;
 
   try {
     const updatedPatient = await prisma.patient.update({
-      where: { id: Number(id) },
+      where: { id },
       data: {
         nom,
         prenom,
@@ -63,7 +79,7 @@ export async function PUT(req, { params }) {
     });
     return NextResponse.json(updatedPatient);
   } catch (error) {
-    console.error("Erreur PUT patient :", error.message, error.stack);
+    console.error("Erreur PUT patient :", error);
     return NextResponse.json(
       { message: "Erreur modification patient", details: error.message },
       { status: 500 }
@@ -71,49 +87,21 @@ export async function PUT(req, { params }) {
   }
 }
 
-
-
-// ❌ DELETE : Supprimer un patient (et son dossier médical lié)
-// ❌ DELETE : Supprimer un patient (et son dossier médical lié)
-export async function DELETE(req, context) {
-  const params = await context.params;
+export async function DELETE(request, { params }) {
   const id = Number(params.patientId);
 
-  console.log("ID reçu pour suppression :", id);
-
   try {
-    // Supprimer les prescriptions liées au dossier médical
     await prisma.prescription.deleteMany({
-      where: {
-        dossier: {
-          patientId: id,
-        },
-      },
+      where: { dossier: { patientId: id } },
     });
-
-    // Supprimer le dossier médical
-    await prisma.dossierMedical.deleteMany({
-      where: { patientId: id },
-    });
-
-    // Supprimer les rendez-vous
-    await prisma.rendezVous.deleteMany({
-      where: { patientId: id },
-    });
-
-    // Supprimer les allergies
-    await prisma.allergie.deleteMany({
-      where: { patientId: id },
-    });
-
-    // Enfin, supprimer le patient
-    await prisma.patient.delete({
-      where: { id },
-    });
+    await prisma.dossierMedical.deleteMany({ where: { patientId: id } });
+    await prisma.rendezVous.deleteMany({ where: { patientId: id } });
+    await prisma.allergie.deleteMany({ where: { patientId: id } });
+    await prisma.patient.delete({ where: { id } });
 
     return NextResponse.json({ message: "Patient supprimé" });
   } catch (error) {
-    console.error("Erreur DELETE patient :", error.message, error.stack);
+    console.error("Erreur DELETE patient :", error);
     return NextResponse.json(
       { message: "Erreur suppression patient", details: error.message },
       { status: 500 }
