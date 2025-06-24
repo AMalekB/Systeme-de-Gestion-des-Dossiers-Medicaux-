@@ -1,35 +1,33 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
-  const router = useRouter()
-  const [role, setRole] = useState(null)
+  const router = useRouter();
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem('role')
-    setRole(storedRole)
-  }, [])
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+  }, []);
 
   const navItems = {
-  ADMIN: [
-    { label: 'Dashboard', path: '/admin/dashboard' },
-    { label: 'Patients', path: '/admin/patients' },
-    { label: 'Dossiers médicaux', path: '/admin/dossiers' },
-    { label: 'Utilisateurs', path: '/admin/medecins' },
-    { label: 'Rendez-vous', path: '/admin/rendezvous' },
-    { label: 'Statistiques', path: '/admin/statistiques' },
-  ],
-  MEDECIN: [
-    { label: 'Dashboard', path: '/medecin/dashboard' },
-    { label: 'Mes Patients', path: '/medecin/patients' },
-    { label: 'Dossiers médicaux', path: '/medecin/dossiers' },
-    { label: 'Prescriptions', path: '/medecin/prescriptions' },
-    { label: 'Rendez-vous', path: '/medecin/rendezvous' },
-  ],
-}
+    ADMIN: [
+      { label: "Dashboard", path: "/admin/dashboard" },
+      { label: "Patients", path: "/admin/patients" },
+      { label: "Dossiers médicaux", path: "/admin/dossiers" },
+      { label: "Utilisateurs", path: "/admin/medecins" },
+      { label: "Rendez-vous", path: "/admin/rendezvous" },
+      { label: "Statistiques", path: "/admin/statistiques" },
+    ],
+    MEDECIN: [
+      { label: "Dashboard", path: "/medecin/dashboard" },
+      { label: "Mes Patients", path: "/medecin/patients" },
+      { label: "Rendez-vous", path: "/medecin/rendezvous" },
+    ],
+  };
 
-  const links = navItems[role] || []
+  const links = navItems[role] || [];
 
   return (
     <aside className="w-64 bg-white shadow h-screen p-4">
@@ -47,5 +45,5 @@ export default function Sidebar() {
         ))}
       </ul>
     </aside>
-  )
+  );
 }
