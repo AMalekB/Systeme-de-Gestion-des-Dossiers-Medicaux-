@@ -8,10 +8,23 @@ export async function GET(request) {
   const { error, payload } = verifyJwtAndRole(request, "MEDECIN");
   if (error) return error;
 
-  const medecinId = payload.userId; // ou payload.id selon ton token
+  // 2️⃣ Récupère l'ID de l'utilisateur depuis le token
+  const userId = payload.userId || payload.id;
+
+  // 3️⃣ Charge le profil Médecin lié à cet utilisateur
+  const medecin = await prisma.medecin.findUnique({
+    where: { utilisateurId: userId },
+  });
+  if (!medecin) {
+    return NextResponse.json(
+      { message: "Aucun profil médecin associé à cet utilisateur" },
+      { status: 404 }
+    );
+  }
+  const medecinId = medecin.id;
 
   try {
-    // 2️⃣ Récupérer tous les RDV de ce médecin, triés par date croissante
+    // 4️⃣ Récupérer tous les RDV de ce médecin, triés par date croissante
     const mesRendezVous = await prisma.rendezVous.findMany({
       where: { medecinId },
       orderBy: { date: "asc" },
