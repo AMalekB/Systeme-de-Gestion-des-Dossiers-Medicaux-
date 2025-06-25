@@ -10,9 +10,9 @@ export default function Sidebar() {
   const router = useRouter()
 
   useEffect(() => {
-    const storedRole = localStorage.getItem('role')
-    setRole(storedRole)
-  }, [])
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+  }, []);
 
   const navItems = {
     ADMIN: [
@@ -28,7 +28,7 @@ export default function Sidebar() {
     ],
   }
 
-  const links = navItems[role] || []
+  const links = navItems[role] || [];
 
   return (
     <>
