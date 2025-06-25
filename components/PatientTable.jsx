@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import PatientModal from './PatientModal'
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function PatientTable() {
   const [patients, setPatients] = useState([])
@@ -108,7 +109,7 @@ export default function PatientTable() {
             <th className="py-2 px-4 text-left">Date de naissance</th>
             <th className="py-2 px-4 text-left">Téléphone</th>
             <th className="py-2 px-4 text-left">Adresse</th>
-            <th className="py-2 px-4 text-left">Actions</th>
+            <th className="py-2 px-4 text-left"></th>
           </tr>
         </thead>
         <tbody>
@@ -120,15 +121,25 @@ export default function PatientTable() {
               <td className="py-2 px-4">{p.telephone}</td>
               <td className="py-2 px-4">{p.adresse}</td>
               <td className="py-2 px-4 space-x-2">
-                <button
-                  onClick={() => { setSelectedPatient(p); setShowModal(true) }}
-                  className="text-blue-500 hover:underline cursor-pointer"
-                >Modifier</button>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="text-red-500 hover:underline cursor-pointer"
-                >Supprimer</button>
-              </td>
+  <button 
+    onClick={() => {
+      setSelectedPatient(p);
+      setShowModal(true);
+    }}
+    className="text-blue-500 hover:text-blue-700 transition"
+    title="Modifier"
+  >
+    <FaEdit />
+  </button>
+
+  <button
+    onClick={() => handleDelete(p.id)}
+    className="text-red-500 hover:text-red-700 transition"
+    title="Supprimer"
+  >
+    <FaTrash />
+  </button>
+</td>
             </tr>
           ))}
         </tbody>

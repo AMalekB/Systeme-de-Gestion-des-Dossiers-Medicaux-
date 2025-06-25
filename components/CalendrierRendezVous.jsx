@@ -143,9 +143,9 @@ export default function CalendrierRendezVous({ apiBase = "/api/rendezvous" }) {
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow">
+    <div className=" p-4 rounded ">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-black">
+        <h2 className="text-4xl font-bold text-black">
           Calendrier des rendez-vous
         </h2>
         <button

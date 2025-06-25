@@ -68,8 +68,8 @@ export default function DashboardAdmin() {
 
   return (
     <LayoutDashboard>
-      <h2 className="text-2xl text-black font-bold mb-4">Bienvenue Admin</h2>
-      <p className="text-black mb-6">Ici, vous pouvez consulter tous.</p>
+      <h2 className="text-4xl text-gray-800 font-bold mb-4 ">Bonjour Admin!</h2>
+      
 
       {/* 📊 Statistiques globales */}
       {!stats ? (

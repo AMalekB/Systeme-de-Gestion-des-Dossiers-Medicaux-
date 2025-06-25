@@ -81,15 +81,15 @@ export default function StatistiquesParPeriode() {
       </div>
 
       {/* 📈 & 🥧 Graphiques synchronisés côte à côte */}
-<div className="flex flex-col lg:flex-row gap-6">
-  <div className="w-full lg:w-1/2">
+<div className="flex flex-col lg:flex-row gap-6 justify-center items-center">
+  <div className="w-full max-w-[600px] h-[500px]">
     <TopMedecinsBarChart
       startDate={startDate}
       endDate={endDate}
       refreshKey={triggerRefresh}
     />
   </div>
-  <div className="w-full lg:w-1/2">
+  <div className="w-full max-w-[600px] h-[500px]">
     <PieChartSpecialites
       startDate={startDate}
       endDate={endDate}

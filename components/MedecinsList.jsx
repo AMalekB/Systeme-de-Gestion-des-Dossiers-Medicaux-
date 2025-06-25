@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import MedecinModal from './MedecinModal'
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function MedecinsList() {
   const [medecins, setMedecins] = useState([])
@@ -114,7 +115,7 @@ export default function MedecinsList() {
               <th className="p-3 border-b border-blue-200 text-left font-semibold">Nom</th>
               <th className="p-3 border-b border-blue-200 text-left font-semibold">Email</th>
               <th className="p-3 border-b border-blue-200 text-left font-semibold">Spécialité</th>
-              <th className="p-3 border-b border-blue-200 text-left font-semibold">Actions</th>
+              <th className="p-3 border-b border-blue-200 text-left font-semibold"></th>
             </tr>
           </thead>
           <tbody>
@@ -123,16 +124,26 @@ export default function MedecinsList() {
                 <td className="p-3 border-b border-gray-300 text-gray-800">{m.utilisateur.nom}</td>
                 <td className="p-3 border-b border-gray-300 text-gray-800">{m.utilisateur.email}</td>
                 <td className="p-3 border-b border-gray-300 text-gray-800">{m.specialite}</td>
-                <td className="p-3 border-b border-gray-300 space-x-3">
-                  <button
-                    className="text-blue-600 hover:underline"
-                    onClick={() => handleEdit(m)}
-                  >Modifier</button>
-                  <button
-                    className="text-red-600 hover:underline"
-                    onClick={() => handleDelete(m.utilisateur.id)}
-                  >Supprimer</button>
-                </td>
+                <td className="p-3 border-b border-gray-300">
+  <div className="flex items-center gap-4">
+    <button
+      className="text-blue-600 hover:text-blue-800 transition"
+      onClick={() => handleEdit(m)}
+      title="Modifier"
+      aria-label="Modifier"
+    >
+      <FaEdit />
+    </button>
+    <button
+      className="text-red-600 hover:text-red-800 transition"
+      onClick={() => handleDelete(m.utilisateur.id)}
+      title="Supprimer"
+      aria-label="Supprimer"
+    >
+      <FaTrash />
+    </button>
+  </div>
+</td>
               </tr>
             ))}
           </tbody>
