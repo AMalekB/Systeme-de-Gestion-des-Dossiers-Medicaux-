@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white pt-0 pb-12 mt-16 relative">
+    <footer className="bg-gray-900 text-white pt-0 pb-12 relative">
       {/* Mini-barre dégradée en haut du footer */}
       <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-sky-400 to-blue-700 mb-6 animate-pulse"></div>
       <div className="container mx-auto px-4">
