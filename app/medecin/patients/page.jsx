@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ export default function MesPatientsPage() {
   const router = useRouter();
   const [autorise, setAutorise] = useState(false);
   const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,9 +33,22 @@ export default function MesPatientsPage() {
         if (!res.ok) throw new Error("Erreur chargement patients");
         return res.json();
       })
-      .then(setPatients)
+      .then((data) => {
+        setPatients(data);
+        setFilteredPatients(data);
+      })
       .catch(() => router.push("/login"));
   }, [router]);
+
+  // 🔍 Filtrage dynamique par nom ou prénom
+  useEffect(() => {
+    const lowerSearch = search.toLowerCase();
+    const filtered = patients.filter((p) =>
+      p.nom.toLowerCase().includes(lowerSearch) ||
+      p.prenom.toLowerCase().includes(lowerSearch)
+    );
+    setFilteredPatients(filtered);
+  }, [search, patients]);
 
   const handleVoirDossier = (patientId) => {
     router.push(`/medecin/dossiers/${patientId}`);
@@ -44,54 +59,58 @@ export default function MesPatientsPage() {
   return (
     <LayoutDashboard>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-black">Mes Patients</h2>
+        <h2 className="text-2xl text-black font-bold">Liste des patients</h2>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <h3 className="text-xl font-semibold mb-4 text-black">
-          Liste de mes patients
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse text-black">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="p-3 border">ID</th>
-                <th className="p-3 border">Nom</th>
-                <th className="p-3 border">Prénom</th>
-                <th className="p-3 border">Date de naissance</th>
-                <th className="p-3 border">Actions</th>
-                {/* Ajout colonne Actions */}
+      <div className="flex justify-end mb-4">
+        <input
+          type="text"
+          placeholder="Recherche (nom ou prénom)..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border px-4 py-2 rounded w-80"
+        />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white rounded-xl shadow">
+          <thead>
+            <tr className="bg-blue-100 text-blue-800">
+              <th className="py-2 px-4 text-left">ID</th>
+              <th className="py-2 px-4 text-left">Nom</th>
+              <th className="py-2 px-4 text-left">Prénom</th>
+              <th className="py-2 px-4 text-left">Date de naissance</th>
+              <th className="py-2 px-4 text-left"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPatients.map((p) => (
+              <tr key={p.id} className="border-t">
+                <td className="py-2 px-4">{p.id}</td>
+                <td className="py-2 px-4">{p.nom}</td>
+                <td className="py-2 px-4">{p.prenom}</td>
+                <td className="py-2 px-4">
+                  {new Date(p.dateNaissance).toLocaleDateString()}
+                </td>
+                <td className="py-2 px-4">
+                  <button
+                    onClick={() => handleVoirDossier(p.id)}
+                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                  >
+                    Dossier médical
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {patients.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-100">
-                  <td className="p-3 border">{p.id}</td>
-                  <td className="p-3 border">{p.nom}</td>
-                  <td className="p-3 border">{p.prenom}</td>
-                  <td className="p-3 border">
-                    {new Date(p.dateNaissance).toLocaleDateString()}
-                  </td>
-                  <td className="p-3 border">
-                    <button
-                      onClick={() => handleVoirDossier(p.id)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-                    >
-                      Voir dossier
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {patients.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-500">
-                    Aucun patient trouvé.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))}
+            {filteredPatients.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-4 text-center text-gray-500">
+                  Aucun patient trouvé.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </LayoutDashboard>
   );

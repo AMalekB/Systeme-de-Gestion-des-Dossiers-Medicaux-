@@ -2,7 +2,6 @@
 import { useState } from 'react'
 
 export default function PatientForm({ onSubmit, patient, onCancel }) {
-  // Protection contre un patient null ou undefined
   const safePatient = patient || {}
 
   const [formData, setFormData] = useState({
@@ -26,7 +25,9 @@ export default function PatientForm({ onSubmit, patient, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {['nom', 'prenom', 'telephone'].map((field) => (
         <div key={field}>
-          <label className="block font-medium">{field}</label>
+          <label className="block font-medium">
+            {field.charAt(0).toUpperCase() + field.slice(1)}
+          </label>
           <input
             type="text"
             name={field}
@@ -51,16 +52,16 @@ export default function PatientForm({ onSubmit, patient, onCancel }) {
       </div>
 
       <div>
-  <label className="block font-medium">Adresse</label>
-  <input
-    type="text"
-    name="adresse"
-    value={formData.adresse}
-    onChange={handleChange}
-    required
-    className="w-full border rounded px-3 py-2"
-  />
-</div>
+        <label className="block font-medium">Adresse</label>
+        <input
+          type="text"
+          name="adresse"
+          value={formData.adresse}
+          onChange={handleChange}
+          required
+          className="w-full border rounded px-3 py-2"
+        />
+      </div>
 
       <div className="flex justify-end space-x-2">
         <button

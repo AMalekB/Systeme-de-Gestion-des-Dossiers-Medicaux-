@@ -23,7 +23,7 @@ export default function Sidebar() {
     ],
     MEDECIN: [
       { label: 'Tableau de bord', path: '/medecin/dashboard', icon: '📊' },
-      { label: 'Mes Patients', path: '/medecin/patients', icon: '🧑‍🤝‍🧑' },
+      { label: 'Patients', path: '/medecin/patients', icon: '🧑‍🤝‍🧑' },
       { label: 'Mes Rendez-vous', path: '/medecin/rendezvous', icon: '📆' },
     ],
   }
