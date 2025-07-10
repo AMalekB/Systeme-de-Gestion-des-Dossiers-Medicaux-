@@ -42,7 +42,7 @@ export default function PatientTable() {
 
   // ✅ Ajouter ou modifier
   const handleSave = async (formData) => {
-    const method = selectedPatient ? 'PUT' : 'POST'
+    const method = selectedPatient ? 'PATCH' : 'POST'
     const url = selectedPatient ? `/api/patients/${selectedPatient.id}` : '/api/patients'
 
     const res = await fetch(url, {

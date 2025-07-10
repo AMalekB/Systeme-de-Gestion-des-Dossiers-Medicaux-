@@ -35,7 +35,7 @@ export async function POST(req) {
           create: {
             historiqueMedical: "",
             notesMedecin: "",
-            medecin: { connect: { id: 1 } }, // ⚠️ à ajuster selon ta logique métier (ex. : medecin assigné par défaut ou plus tard)
+            medecin: { connect: { id: 1 } }, // 👈 fonctionne maintenant
           },
         },
       },
@@ -51,5 +51,4 @@ export async function POST(req) {
       { message: "Erreur création patient" },
       { status: 500 }
     );
-  }
-}
+  }}
