@@ -150,9 +150,9 @@ export default function CalendrierRendezVous({ apiBase = "/api/rendezvous" }) {
         </h2>
         <button
           onClick={() => setOpenModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
         >
-          ➕ Ajouter un rendez-vous
+          + Ajouter un rendez-vous
         </button>
       </div>
 
