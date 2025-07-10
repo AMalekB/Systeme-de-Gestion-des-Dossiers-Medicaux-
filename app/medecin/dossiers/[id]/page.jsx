@@ -1,3 +1,4 @@
+// app/medecin/dossiers/[id]/pages.jsx
 "use client";
 
 import { useEffect, useState } from "react";

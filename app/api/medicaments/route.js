@@ -12,7 +12,7 @@ export async function GET(req) {
   // Recherche directe dans la base locale (SQLite LIKE est insensible à la casse ASCII)
   const meds = await prisma.medicament.findMany({
     where: {
-      nom: { contains: search },
+      nom: { contains: search, mode: "insensitive" },
     },
     take: 20,
   });
