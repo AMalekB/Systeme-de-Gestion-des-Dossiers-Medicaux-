@@ -42,7 +42,7 @@ export default function DashboardMedecin() {
   return (
     <LayoutDashboard>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl text-black font-bold">Bienvenue Médecin</h2>
+        <h2 className="text-2xl text-black font-bold">Bienvenue Docteur(e)</h2>
       </div>
 
       <p className="mb-6 text-black">
