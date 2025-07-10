@@ -26,7 +26,6 @@ model Patient {
   adresse        String
   telephone      String
 
-  // One-to-one avec DossierMedical
   dossierMedical DossierMedical?  // relation inversée
   allergies      Allergie[]
   rendezVous     RendezVous[]
@@ -47,7 +46,10 @@ model Medecin {
 
   prescriptions  Prescription[]
   rendezVous     RendezVous[]
-  historique     Historique[]  // Journal des actions sur dossiers
+  historique     Historique[]
+
+  // 🔁 Relation inverse vers DossierMedical
+  dossiers       DossierMedical[]
 }
 
 model Administrateur {
@@ -63,12 +65,15 @@ model DossierMedical {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  // Fichier unique par patient
   patient   Patient       @relation(fields: [patientId], references: [id])
   patientId Int           @unique
 
+  // RELATION Medecin 
+  medecin   Medecin?      @relation(fields: [medecinId], references: [id])
+  medecinId Int?
+
   prescriptions     Prescription[]
-  historique        Historique[]     // Entrées d'historique
+  historique        Historique[]
 }
 
 model Prescription {
@@ -86,9 +91,9 @@ model Prescription {
 
 model Medicament {
   id       Int                       @id @default(autoincrement())
-  nom      String                    // Nom du médicament
+  nom      String
 
-  liens    PrescriptionMedicament[]  // Jointure vers prescriptions
+  liens    PrescriptionMedicament[]
 }
 
 model PrescriptionMedicament {
@@ -112,8 +117,8 @@ model Historique {
   medecin      Medecin         @relation(fields: [medecinId], references: [id])
   medecinId    Int
   date         DateTime        @default(now())
-  type         String          // ex. "prescription", "note", "modification"
-  contenu      String          // Description de l'action
+  type         String
+  contenu      String
 }
 
 model RendezVous {
