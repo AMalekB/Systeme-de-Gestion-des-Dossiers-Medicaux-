@@ -139,10 +139,54 @@ export default function DossierMedicalPage() {
       {/* Historique médical libre */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
         <h3 className="text-xl font-semibold mb-3">Historique médical</h3>
-        <p>
-          {dossierMedical.historiqueMedical || "Aucun historique disponible."}
-        </p>
+        <p style={{ whiteSpace: "pre-line" }}>
+  {dossierMedical.historiqueMedical || "Aucun historique disponible."}
+</p>
       </div>
+
+      {/* Ajouter une note dans l’historique médical */}
+<div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
+  <h3 className="text-xl font-semibold mb-3">Ajouter une note médicale</h3>
+  <form
+    onSubmit={async (e) => {
+      e.preventDefault();
+      const contenu = e.target.elements.note.value.trim();
+      if (!contenu) return;
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`/api/patients/${patientId}/historique`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ contenu }),
+      });
+
+      if (res.ok) {
+        e.target.reset();
+        await chargerPatient(token); // Recharge les données
+      } else {
+        alert("Erreur lors de l’enregistrement de la note.");
+      }
+    }}
+    className="space-y-4"
+  >
+    <textarea
+      name="note"
+      placeholder="Écrivez une note médicale..."
+      className="w-full border px-3 py-2 rounded"
+      required
+    />
+    <button
+      type="submit"
+      className="bg-blue-600 text-white px-4 py-2 rounded"
+    >
+      Ajouter la note
+    </button>
+  </form>
+</div>
+
 
       {/* Liste des prescriptions */}
       <div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
@@ -157,7 +201,7 @@ export default function DossierMedicalPage() {
             return (
               <div key={p.id} className="mb-4 p-4 bg-gray-50 rounded border">
                 <div className="text-sm text-gray-600 mb-1">
-                  {formattedDate} par Dr {p.medecin.utilisateur.nom}
+                  {formattedDate} par  {p.medecin.utilisateur.nom}
                 </div>
                 {p.description && (
                   <p className="italic mb-2">{p.description}</p>
@@ -275,7 +319,7 @@ export default function DossierMedicalPage() {
                 <span className="font-medium">
                   {new Date(h.date).toLocaleString()}
                 </span>{" "}
-                — Dr {h.medecin.utilisateur.nom} :{" "}
+                —  {h.medecin.utilisateur.nom} :{" "}
                 <span className="italic">{h.contenu}</span>
               </li>
             ))}
