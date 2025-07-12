@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
+import Image from 'next/image';
 
 export default function Sidebar() {
   const [role, setRole] = useState(null)
@@ -47,7 +48,12 @@ export default function Sidebar() {
         } sm:translate-x-0`}
       >
         <div className="h-full p-5 overflow-y-auto">
-          <h2 className="text-4xl font-bold text-blue-500 mb-6 text-center">SGDM</h2>
+          <Image
+            src="/images/SGDM.webp"
+            alt="Logo"
+            width={300}
+            height={150}
+            className="mb-6"/>
           <ul className="space-y-4">
             {links.map((item) => (
               <li key={item.path}>
