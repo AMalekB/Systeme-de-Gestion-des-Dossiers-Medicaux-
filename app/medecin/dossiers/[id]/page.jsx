@@ -136,182 +136,204 @@ export default function DossierMedicalPage() {
         </p>
       </div>
 
-      {/* Historique médical libre */}
-      <div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
-        <h3 className="text-xl font-semibold mb-3">Historique médical</h3>
-        <p style={{ whiteSpace: "pre-line" }}>
-  {dossierMedical.historiqueMedical || "Aucun historique disponible."}
-</p>
-      </div>
+      {/* Historique médical et ajout de note côte à côte */}
+<div className="flex gap-6 mb-6">
+  {/* Bloc historique médical – 3/4 */}
+  <div className="w-1/2 bg-white p-6 rounded-xl shadow-md text-black">
+    <h3 className="text-xl font-semibold mb-3">Historique médical</h3>
+    <p style={{ whiteSpace: "pre-line" }}>
+      {dossierMedical.historiqueMedical || "Aucun historique disponible."}
+    </p>
+  </div>
 
-      {/* Ajouter une note dans l’historique médical */}
-<div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
-  <h3 className="text-xl font-semibold mb-3">Ajouter une note médicale</h3>
-  <form
-    onSubmit={async (e) => {
-      e.preventDefault();
-      const contenu = e.target.elements.note.value.trim();
-      if (!contenu) return;
-      const token = localStorage.getItem("token");
+  {/* Bloc ajout de note – 1/4 */}
+  <div className="w-1/2 bg-white p-6 rounded-xl shadow-md text-black flex flex-col justify-between h-[300px]">
+    <h3 className="text-xl font-semibold mb-3">Ajouter une note médicale</h3>
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const contenu = e.target.elements.note.value.trim();
+        if (!contenu) return;
+        const token = localStorage.getItem("token");
 
-      const res = await fetch(`/api/patients/${patientId}/historique`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ contenu }),
-      });
+        const res = await fetch(`/api/patients/${patientId}/historique`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ contenu }),
+        });
 
-      if (res.ok) {
-        e.target.reset();
-        await chargerPatient(token); // Recharge les données
-      } else {
-        alert("Erreur lors de l’enregistrement de la note.");
-      }
-    }}
-    className="space-y-4"
-  >
+        if (res.ok) {
+          e.target.reset();
+          await chargerPatient(token);
+        } else {
+          alert("Erreur lors de l’enregistrement de la note.");
+        }
+      }}
+      className="space-y-4"
+    >
+      <textarea
+        name="note"
+        placeholder="Écrivez une note médicale..."
+        className="w-full h-40 border px-3 py-2 rounded"
+        required
+      />
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+      >
+        Ajouter la note
+      </button>
+    </form>
+  </div>
+</div>
+
+
+
+{/* Section prescriptions : liste + formulaire côte à côte */}
+<div className="flex gap-6 mb-6">
+  {/* 📋 Liste des prescriptions – 1/2 */}
+  <div className="w-1/2 bg-white p-6 rounded-xl shadow-md text-black">
+    <h3 className="text-xl font-semibold mb-3">Prescriptions</h3>
+    {prescriptions.length > 0 ? (
+      prescriptions.map((p) => {
+        const d = new Date(p.date);
+        const formattedDate = `${String(d.getDate()).padStart(
+          2,
+          "0"
+        )}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+        return (
+          <div key={p.id} className="mb-4 p-4 bg-gray-50 rounded border">
+            <div className="text-sm text-gray-600 mb-1">
+              {formattedDate} par {p.medecin.utilisateur.nom}
+            </div>
+            {p.description && (
+              <p className="italic mb-2">{p.description}</p>
+            )}
+            <ul className="list-disc pl-5">
+              {p.items.map((it) => (
+                <li key={`${p.id}-${it.medicamentId}`}>
+                  <strong>{it.medicament.nom}</strong> — {it.dosage} —{" "}
+                  {it.frequence} — {it.duree}
+                  {it.instructions && <span> ({it.instructions})</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })
+    ) : (
+      <p>Aucune prescription disponible.</p>
+    )}
+  </div>
+
+ {/* ➕ Formulaire – 1/2 */}
+<div className="w-1/2 bg-white p-6 rounded-xl shadow-md text-black flex flex-col justify-between h-[500px]">
+  <h3 className="text-xl font-semibold mb-3">Ajouter une prescription</h3>
+  <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 h-full">
+    {/* Zone de description */}
     <textarea
-      name="note"
-      placeholder="Écrivez une note médicale..."
-      className="w-full border px-3 py-2 rounded"
-      required
+      {...register("description")}
+      placeholder="Description (facultatif)"
+      className="w-full border px-3 py-2 rounded h-20"
     />
+
+    {/* Liste des médicaments */}
+    <div className="flex flex-col gap-2 overflow-y-auto max-h-[250px]">
+      {fields.map((field, idx) => (
+        <div key={field.id} className="grid grid-cols-7 gap-2 items-end">
+          {/* Médicament avec datalist */}
+          <div className="col-span-2">
+            <input
+              type="text"
+              placeholder="Médicament..."
+              className="border px-2 py-1 rounded w-full"
+              list={`med-list-${idx}`}
+              required
+              onChange={(e) => {
+                const val = e.target.value;
+                setMedSearch(val);
+                const sel = medOptions.find((m) => m.nom === val);
+                setValue(`items.${idx}.medicamentId`, sel ? sel.id : "");
+              }}
+            />
+            <datalist id={`med-list-${idx}`}>
+              {medOptions.map((m) => (
+                <option key={m.id} value={m.nom} />
+              ))}
+            </datalist>
+          </div>
+
+          {/* Autres champs */}
+          <input
+            {...register(`items.${idx}.dosage`)}
+            placeholder="Dosage"
+            className="border px-2 py-1 rounded"
+          />
+          <input
+            {...register(`items.${idx}.frequence`)}
+            placeholder="Fréquence"
+            className="border px-2 py-1 rounded"
+          />
+          <input
+            {...register(`items.${idx}.duree`)}
+            placeholder="Durée"
+            className="border px-2 py-1 rounded"
+          />
+          <input
+            {...register(`items.${idx}.instructions`)}
+            placeholder="Instructions"
+            className="border px-1 py-1 rounded"
+          />
+
+          {/* Bouton poubelle */}
+          <button
+            type="button"
+            onClick={() => remove(idx)}
+            className="text-red-600 text-xl px-2"
+            title="Supprimer ce médicament"
+          >
+            🗑️
+          </button>
+        </div>
+      ))}
+
+      {/* Ajouter un nouveau médicament */}
+      <button
+        type="button"
+        onClick={() =>
+          append({
+            medicamentId: "",
+            dosage: "",
+            frequence: "",
+            duree: "",
+            instructions: "",
+          })
+        }
+        className="text-blue-600 text-sm mt-2 self-start"
+      >
+        + Ajouter un médicament
+      </button>
+    </div>
+
+    {/* Bouton de soumission */}
     <button
       type="submit"
-      className="bg-blue-600 text-white px-4 py-2 rounded"
+      className="bg-green-600 text-white px-4 py-2 rounded w-full mt-auto"
     >
-      Ajouter la note
+      Enregistrer la prescription
     </button>
   </form>
 </div>
 
+</div>
 
-      {/* Liste des prescriptions */}
-      <div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
-        <h3 className="text-xl font-semibold mb-3">Prescriptions</h3>
-        {prescriptions.length > 0 ? (
-          prescriptions.map((p) => {
-            const d = new Date(p.date);
-            const formattedDate = `${String(d.getDate()).padStart(
-              2,
-              "0"
-            )}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-            return (
-              <div key={p.id} className="mb-4 p-4 bg-gray-50 rounded border">
-                <div className="text-sm text-gray-600 mb-1">
-                  {formattedDate} par  {p.medecin.utilisateur.nom}
-                </div>
-                {p.description && (
-                  <p className="italic mb-2">{p.description}</p>
-                )}
-                <ul className="list-disc pl-5">
-                  {p.items.map((it) => (
-                    <li key={`${p.id}-${it.medicamentId}`}>
-                      <strong>{it.medicament.nom}</strong> — {it.dosage} —{" "}
-                      {it.frequence} — {it.duree}
-                      {it.instructions && <span> ({it.instructions})</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })
-        ) : (
-          <p>Aucune prescription disponible.</p>
-        )}
-      </div>
-
-      {/* Formulaire */}
-      <div className="bg-white p-6 rounded-xl shadow-md mb-6 text-black">
-        <h3 className="text-xl font-semibold mb-3">Ajouter une prescription</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <textarea
-            {...register("description")}
-            placeholder="Description (facultatif)"
-            className="w-full border px-3 py-2 rounded"
-          />
-          {fields.map((field, idx) => (
-            <div key={field.id} className="grid grid-cols-6 gap-2 items-end">
-              <div className="col-span-2">
-                <input
-                  type="text"
-                  placeholder="Médicament..."
-                  className="col-span-2 border px-2 py-1 rounded"
-                  list={`med-list-${idx}`}
-                  required
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setMedSearch(val);
-                    const sel = medOptions.find((m) => m.nom === val);
-                    setValue(`items.${idx}.medicamentId`, sel ? sel.id : "");
-                  }}
-                />
-                <datalist id={`med-list-${idx}`}>
-                  {medOptions.map((m) => (
-                    <option key={m.id} value={m.nom} />
-                  ))}
-                </datalist>
-              </div>
-              <input
-                {...register(`items.${idx}.dosage`)}
-                placeholder="Dosage"
-                className="border px-2 py-1 rounded"
-              />
-              <input
-                {...register(`items.${idx}.frequence`)}
-                placeholder="Fréquence"
-                className="border px-2 py-1 rounded"
-              />
-              <input
-                {...register(`items.${idx}.duree`)}
-                placeholder="Durée"
-                className="border px-2 py-1 rounded"
-              />
-              <input
-                {...register(`items.${idx}.instructions`)}
-                placeholder="Instructions"
-                className="border px-2 py-1 rounded"
-              />
-              <button
-                type="button"
-                onClick={() => remove(idx)}
-                className="text-red-600"
-              >
-                🗑️
-              </button>
-            </div>
-          ))}
-          <div className="flex items-center mt-2 space-x-4">
-            <button
-              type="button"
-              onClick={() =>
-                append({
-                  medicamentId: "",
-                  dosage: "",
-                  frequence: "",
-                  duree: "",
-                  instructions: "",
-                })
-              }
-              className="text-blue-600"
-            >
-              + Ajouter un médicament
-            </button>
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded"
-            >
-              Enregistrer la prescription
-            </button>
-          </div>
-        </form>
-      </div>
 
       {/* Historique des actions */}
       <div className="bg-white p-6 rounded-xl shadow-md mt-6 text-black">
-        <h3 className="text-xl font-semibold mb-3">Historique des actions</h3>
+        <h3 className="text-xl font-semibold mb-3">Journal de prestations </h3>
         {historique.length > 0 ? (
           <ul className="space-y-2">
             {historique.map((h) => (

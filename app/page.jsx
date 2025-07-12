@@ -59,16 +59,21 @@ export default function Home() {
             style={{ top: "80%", left: "70%", animationDelay: "3s" }}
           ></div>
         </div>
-        <div className="relative container mx-auto px-4 py-4">
+        <div className="relative container mx-auto px-4 py-40">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
-              Plateforme dédiée aux Médecins et Administrateurs
+            <h1 className="text-6xl md:text-7xl font-bold mb-8 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
+              eClinique 
             </h1>
-            <p className="text-xl md:text-2xl mb-12 text-blue-100 leading-relaxed">
-              Accédez à un système moderne et sécurisé pour la gestion des
-              dossiers médicaux, réservé exclusivement aux professionnels de
-              santé et aux administrateurs de clinique.
-            </p>
+            
+            <h2 className="text-2xl md:text-3xl mb-6 text-blue-200">
+              Plateforme dédiée aux Professionnels de la santé 
+              
+            </h2>
+            <h4 className="text-xl md:text-2xl mb-6 text-blue-200">
+              Simplifiez la gestion de vos dossiers médicaux
+            </h4>
+            
+           
             {/* Boutons d'action principaux */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link
@@ -178,7 +183,7 @@ export default function Home() {
       >
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-sky-600">
-            Fonctionnalités pour Médecins & Administrateurs
+            Fonctionnalités dédiées à nos partenaires
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {/* Carte 1 - Gestion des Patients */}
@@ -223,7 +228,7 @@ export default function Home() {
               </h3>
               <p className="text-gray-600 leading-relaxed">
                 Visualisez les statistiques, gérez les utilisateurs
-                (administrateurs) et optimisez la gestion de la clinique.
+                 et optimisez la gestion de la clinique.
               </p>
             </div>
           </div>
