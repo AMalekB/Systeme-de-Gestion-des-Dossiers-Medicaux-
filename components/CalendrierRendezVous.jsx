@@ -208,15 +208,16 @@ export default function CalendrierRendezVous({ apiBase = "/api/rendezvous" }) {
         eventDisplay="block"
       />
 
-      {openModal && <RendezvousModal onSubmit={handleCreate} rendezvous={{}} />}
+      {openModal && <RendezvousModal onSubmit={handleCreate} rendezvous={{}}  onCancelEdit={() => setOpenModal(false)} />}
       {modalDate && !editingRdv && (
         <RendezvousModal
           onSubmit={handleCreate}
           rendezvous={{ date: modalDate }}
+          onCancelEdit={() => setModalDate(null)}
         />
       )}
       {editingRdv && (
-        <RendezvousModal onSubmit={handleUpdate} rendezvous={editingRdv} />
+        <RendezvousModal onSubmit={handleUpdate} rendezvous={editingRdv}  onCancelEdit={() => setEditingRdv(null)} />
       )}
       {selectedDay && (
         <RendezvousDayModal
