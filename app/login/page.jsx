@@ -56,7 +56,10 @@ export default function Connexion() {
         router.push("/admin/dashboard");
       } else if (data.role === "MEDECIN") {
         router.push("/medecin/dashboard");
-      } else {
+      } 
+      else if (data.role === "PATIENT") {
+  router.push("/patient/dashboard");}
+      else {
         setError("Rôle inconnu !");
       }
     } catch (err) {
