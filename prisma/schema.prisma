@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  MEDECIN
+  PATIENT
+}
+
 model Utilisateur {
   id             Int             @id @default(autoincrement())
   nom            String
@@ -16,6 +22,7 @@ model Utilisateur {
 
   medecin        Medecin?
   administrateur Administrateur?
+  patient        Patient?         // 🔄 Ajouté : relation avec Patient
 }
 
 model Patient {
@@ -26,10 +33,15 @@ model Patient {
   adresse        String
   telephone      String
 
-  dossierMedical DossierMedical?  // relation inversée
+  utilisateurId  Int              @unique
+  utilisateur    Utilisateur      @relation(fields: [utilisateurId], references: [id])
+
+  dossierMedical DossierMedical?
   allergies      Allergie[]
   rendezVous     RendezVous[]
 }
+
+
 
 model Allergie {
   id        Int     @id @default(autoincrement())
@@ -47,8 +59,6 @@ model Medecin {
   prescriptions  Prescription[]
   rendezVous     RendezVous[]
   historique     Historique[]
-
-  // 🔁 Relation inverse vers DossierMedical
   dossiers       DossierMedical[]
 }
 
@@ -68,7 +78,6 @@ model DossierMedical {
   patient   Patient       @relation(fields: [patientId], references: [id])
   patientId Int           @unique
 
-  // RELATION Medecin 
   medecin   Medecin?      @relation(fields: [medecinId], references: [id])
   medecinId Int?
 
@@ -86,7 +95,7 @@ model Prescription {
   medecin     Medecin                  @relation(fields: [medecinId], references: [id])
   medecinId   Int
 
-  items       PrescriptionMedicament[] // Lignes de prescription
+  items       PrescriptionMedicament[]
 }
 
 model Medicament {
@@ -133,9 +142,4 @@ model RendezVous {
 
   medecin   Medecin @relation(fields: [medecinId], references: [id])
   medecinId Int
-}
-
-enum Role {
-  ADMIN
-  MEDECIN
 }

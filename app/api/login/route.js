@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "supersecret";
@@ -8,19 +9,9 @@ const SECRET = process.env.JWT_SECRET || "supersecret";
 export async function POST(req) {
   const { email, password } = await req.json();
 
-  // Validation des champs requis
   if (!email || !password) {
     return NextResponse.json(
       { message: "L'email et le mot de passe sont requis." },
-      { status: 400 }
-    );
-  }
-
-  // Validation du format de l'email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return NextResponse.json(
-      { message: "Format d'email invalide." },
       { status: 400 }
     );
   }
@@ -29,7 +20,24 @@ export async function POST(req) {
     where: { email },
   });
 
-  if (!user || user.motDePasse !== password) {
+  if (!user) {
+    return NextResponse.json(
+      { message: "Email ou mot de passe invalide" },
+      { status: 401 }
+    );
+  }
+
+  let isPasswordValid = false;
+
+  if (user.role === "PATIENT") {
+    // 🔐 patient = mot de passe hashé
+    isPasswordValid = await bcrypt.compare(password, user.motDePasse);
+  } else {
+    // 👨‍⚕️ médecin et admin = mot de passe en clair (temporairement)
+    isPasswordValid = password === user.motDePasse;
+  }
+
+  if (!isPasswordValid) {
     return NextResponse.json(
       { message: "Email ou mot de passe invalide" },
       { status: 401 }
@@ -42,7 +50,7 @@ export async function POST(req) {
 
   return NextResponse.json({
     token,
-    role: user.role, // 👈 important pour la redirection
+    role: user.role,
     nom: user.nom,
   });
 }
