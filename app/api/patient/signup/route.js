@@ -6,6 +6,17 @@ import { NextResponse } from 'next/server';
 const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || 'supersecret';
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
