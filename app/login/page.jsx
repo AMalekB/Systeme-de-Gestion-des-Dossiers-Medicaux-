@@ -51,14 +51,14 @@ export default function Connexion() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-
+ document.cookie = `token=${data.token}; path=/; max-age=3600`;
       if (data.role === "ADMIN") {
         router.push("/admin/dashboard");
       } else if (data.role === "MEDECIN") {
         router.push("/medecin/dashboard");
       } 
       else if (data.role === "PATIENT") {
-  router.push("/patient/dashboard");}
+  router.push("/patient/rendezvous");}
       else {
         setError("Rôle inconnu !");
       }

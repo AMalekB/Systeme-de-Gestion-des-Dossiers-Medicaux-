@@ -142,7 +142,7 @@ export default function DossierMedicalPage() {
   <div className="w-1/2 bg-white p-6 rounded-xl shadow-md text-black">
     <h3 className="text-xl font-semibold mb-3">Historique médical</h3>
     <p style={{ whiteSpace: "pre-line" }}>
-      {dossierMedical.historiqueMedical || "Aucun historique disponible."}
+      {dossierMedical?.historiqueMedical || "Aucun historique disponible."}
     </p>
   </div>
 
